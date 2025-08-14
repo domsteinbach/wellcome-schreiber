@@ -202,9 +202,11 @@ document.addEventListener("DOMContentLoaded", function () {
 		Tip('150%-Größe anzeigen');
 	});
 
+	
 	document.getElementById("g150").addEventListener("mouseout", function () {
 		UnTip();
 	});
+
 
 	document.getElementById("g150").addEventListener("click", function () {
 		zoom150();
@@ -233,10 +235,19 @@ document.addEventListener("DOMContentLoaded", function () {
 	document.getElementById("zoomplus").addEventListener("click", function () {
 		zoomin();
 	});
+
+	document.getElementById("startseite-icon-button").addEventListener("mouseover", function () {
+		Tip('Zur Startseite', 20, 10);
+	});
+
+	document.getElementById("startseite-icon-button").addEventListener("mouseout", function () {
+		UnTip();
+	});
+
 });
 
 // Funktion, um Tooltip anzuzeigen
-function Tip(text) {
+function Tip(text, xDiff = 10, yDiff = -30) {
 	var tooltip = document.createElement("div");
 	tooltip.innerHTML = text;
 	tooltip.className = "tooltip";
@@ -245,8 +256,8 @@ function Tip(text) {
 	document.addEventListener("mousemove", updateTooltipPosition);
 
 	function updateTooltipPosition(event) {
-		var x = event.clientX + 10;
-		var y = event.clientY - 30;
+		var x = event.clientX + xDiff;
+		var y = event.clientY + yDiff;
 
 		tooltip.style.left = x + 'px';
 		tooltip.style.top = y + 'px';
@@ -611,8 +622,29 @@ function goNextPage() {
 }
 
 
-
 function goPrevPage() {
+    if (zoom === 50) {
+    	if (curSlide === firstPageDS.toString() ) {
+        	return;
+        }
+    	curSlide--;
+    	window.localStorage.setItem('localStoreCurSlide', curSlide);
+        bildAnzeigeDS();
+    } else {  
+    	if (curSlide === (firstPageDS + 1).toString() && rectoVerso === "r") {
+        	return;
+        }
+    	if (rectoVerso === "r") {
+        	curSlide--;
+        }
+        rectoVerso = rectoVerso === "r" ? "v" : "r";
+        window.localStorage.setItem('localStoreRectoVerso', rectoVerso);
+        bildAnzeigeES();
+    }
+}
+
+
+function goPrevPage_old() {
 	if (zoom == 50) {
 		if (curSlide > firstPageDS) {
 			if (addPage.has(parseInt(curSlide))) {

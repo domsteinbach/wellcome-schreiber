@@ -231,24 +231,34 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("zoomplus").addEventListener("click", function() {
         zoomin();
     });
+
+	
+	document.getElementById("startseite-icon-button").addEventListener("mouseover", function () {
+		Tip('Zur Startseite', 20, 10);
+	});
+
+	document.getElementById("startseite-icon-button").addEventListener("mouseout", function () {
+		UnTip();
+	});
+
 });
 
 // Funktion, um Tooltip anzuzeigen
-function Tip(text) {
-    var tooltip = document.createElement("div");
-    tooltip.innerHTML = text;
-    tooltip.className = "tooltip";
-    document.body.appendChild(tooltip);
+function Tip(text, xDiff = 10, yDiff = -30) {
+	var tooltip = document.createElement("div");
+	tooltip.innerHTML = text;
+	tooltip.className = "tooltip";
+	document.body.appendChild(tooltip);
 
-    document.addEventListener("mousemove", updateTooltipPosition);
+	document.addEventListener("mousemove", updateTooltipPosition);
 
-    function updateTooltipPosition(event) {
-        var x = event.clientX + 10; 
-        var y = event.clientY - 30; 
+	function updateTooltipPosition(event) {
+		var x = event.clientX + xDiff;
+		var y = event.clientY + yDiff;
 
-        tooltip.style.left = x + 'px';
-        tooltip.style.top = y + 'px';
-    }
+		tooltip.style.left = x + 'px';
+		tooltip.style.top = y + 'px';
+	}
 }
 
 // Funktion, um Tooltip zu entfernen

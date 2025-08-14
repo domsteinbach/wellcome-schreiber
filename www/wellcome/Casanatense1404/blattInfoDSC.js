@@ -14,7 +14,6 @@ function blattInfoDS(blatt) {
 		case "-3": lagenNr=""; lagenSymb="blind"; lagenName=""; konkordanz=""; aktBuch = 0; imgDescr = false; break;
 		case "-2": lagenNr=""; lagenSymb="L8_w1_16_01r"; lagenName="Oktonio – 1 Bl."; konkordanz=""; aktBuch = 0; imgDescr = false; break;
 		case "-1": lagenNr="1"; lagenSymb="L8_w1_16_01v02r"; lagenName="Oktonio – 1 Bl."; konkordanz=""; aktBuch = 0; imgDescr = false; break;
-
 		case "0": lagenNr="1"; lagenSymb="L8_w1_16_02v03r"; lagenName="Oktonio – 1 Bl."; konkordanz=""; aktBuch = 1; imgDescr = false; break;
 		case "1": lagenNr="1"; lagenSymb="L8_w1_16_03v04r"; lagenName="Oktonio – 1 Bl."; konkordanz="Bl. 1v–2r"; aktBuch = 2; imgDescr = false; break;
 		case "2": lagenNr="1"; lagenSymb="L8_w1_16_04v05r"; lagenName="Oktonio – 1 Bl."; konkordanz="Bl. 2v–4r"; aktBuch = 3; imgDescr = false; break;
