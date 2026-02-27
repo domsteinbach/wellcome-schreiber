@@ -144,6 +144,10 @@ figure {
   height: 50%;
 }
 
+#cc-by-nc-sa_logo {
+  max-width: 30%;
+}
+
 #hs_extern {
 	/*clear: both;*/
 }
