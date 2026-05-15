@@ -887,7 +887,7 @@ function bildAnzeigeES() {
 		}
 
 		switch (blatt) {
-			case "-2r": blattAngabe = "Einband vorne aussen"; lagenAngabe = ""; bildURL = zoom + "/Casanatense_Ms1404_000_Einband_vorne_aussen.jpg"; buchAuswahl = 0; break;
+			case "-2r": blattAngabe = "Einband vorne außen"; lagenAngabe = ""; bildURL = zoom + "/Casanatense_Ms1404_000_Einband_vorne_aussen.jpg"; buchAuswahl = 0; break;
 			case "-2v": blattAngabe = "Einband vorne innen"; lagenAngabe = ""; bildURL = zoom + "/Casanatense_Ms1404_000_Einband_vorne_innen.jpg"; buchAuswahl = 0; break;
 			case "-1v": blattAngabe = "Bl. Iv"; lagenAngabe = "1. Lage, Oktonio – 1 Bl."; bildURL = zoom + "/Casanatense_Ms1404_000_Iv.jpg"; buchAuswahl = 0; break;
 			case "-1r": blattAngabe = "Bl. Ir"; lagenAngabe = "1. Lage, Oktonio – 1 Bl."; bildURL = zoom + "/Casanatense_Ms1404_000_Ir.jpg"; buchAuswahl = 0; break;
@@ -895,7 +895,7 @@ function bildAnzeigeES() {
 			case "0r": blattAngabe = "Bl. IIr"; lagenAngabe = "1. Lage, Oktonio – 1 Bl."; bildURL = zoom + "/Casanatense_Ms1404_000_IIr.jpg"; buchAuswahl = 0; break;
 			//case "40": seitenAngabe = "Bl. 40v"; lagenAngabe = "4. Lage, Unio + 1 Bl."; buchAuswahl = aktBuch; break;
 			case "41r": blattAngabe = ""; lagenAngabe = ""; bildURL = zoom + "/Casanatense_Ms1404_041r.jpg"; buchAuswahl = 0; break;
-			case "41v": blattAngabe = "Einband hinten aussen"; lagenAngabe = ""; bildURL = zoom + "/Casanatense_Ms1404_000_Einband_hinten.jpg"; buchAuswahl = 0; break;
+			case "41v": blattAngabe = "Einband hinten außen"; lagenAngabe = ""; bildURL = zoom + "/Casanatense_Ms1404_000_Einband_hinten.jpg"; buchAuswahl = 0; break;
 			//case "-2v": blattAngabe = "Buchdeckel"; lagenAngabe = ""; bildURL = "../RBilder/" + zoom + "/Rvs002v.jpg"; buchAuswahl = 0; break;
 			//case "-2r": blattAngabe = "Buchdeckel vorne"; lagenAngabe = ""; bildURL = "../RBilder/" + zoom + "/Rvs002r.jpg"; buchAuswahl = 1; break;
 			//case "181r": blattAngabe = "Vorsatzblatt"; lagenAngabe = ""; buchAuswahl = 0; break;
@@ -1067,12 +1067,12 @@ function bildAnzeigeDS() {
 
 	switch (curSlide) {
 
-		case "-3": seitenAngabe = "Einband vorne aussen"; lagenAngabe = ""; temp = "R000"; buchAuswahl = 0; break;
+		case "-3": seitenAngabe = "Einband vorne außen"; lagenAngabe = ""; temp = "R000"; buchAuswahl = 0; break;
 		case "-2": seitenAngabe = "Einband v.i. / Bl. Ir"; lagenAngabe = "1. Lage, Oktonio – 1 Bl."; temp = "R000"; buchAuswahl = 0; break;
 		case "-1": seitenAngabe = "Bl. Iv / Bl. IIr"; lagenAngabe = "1. Lage, Oktonio – 1 Bl."; temp = "R000"; buchAuswahl = 0; break;
 		case "0":  seitenAngabe = "Bl. IIv / Bl. 1r"; lagenAngabe = "1. Lage, Oktonio – 1 Bl."; konkordanz = "Bl. 1r"; temp = "R000"; buchAuswahl = aktBuch + 1; break;
 		case "40": seitenAngabe = "Bl. 40v"; lagenAngabe = "4. Lage, Unio + 1 Bl."; buchAuswahl = aktBuch; break;
-		case "41": seitenAngabe = "Einband hinten aussen"; lagenAngabe = ""; buchAuswahl = aktBuch; break;
+		case "41": seitenAngabe = "Einband hinten außen"; lagenAngabe = ""; buchAuswahl = aktBuch; break;
 		//case "0": seitenAngabe = "Vorsatzbl. / Bl. Ir"; lagenAngabe = ""; buchAuswahl = 0; break;
 		//case "1": seitenAngabe = "Bl. Iv / Bl. " + curSlide + "r"; lagenAngabe = lagenNr + lageTxt + lagenName; buchAuswahl = 2; break;
 		//case "181": seitenAngabe = "Bl. " + (curSlide-1) + "v / Vorsatzbl."; lagenAngabe = ""; buchAuswahl = aktBuch + 1; break;
