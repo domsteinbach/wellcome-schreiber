@@ -66,7 +66,7 @@ form[name="naviHSR"] {
     flex-direction: row;
     align-items: flex-start;
     flex-wrap: wrap;
-    gap: 1em;
+    gap: 1.5em;
     margin: 0;
 }
 
@@ -80,23 +80,25 @@ form[name="naviHSR"] {
 .hdr-arrows {
     display: flex;
     flex-direction: row;
-    align-items: center;
-    gap: 0.15em;
-    align-self: center;
+    align-items: flex-start;
+    gap: 0.5em;
 }
 
 .hdr-blatt-input {
     display: flex;
     flex-direction: row;
-    align-items: center;
-    gap: 0.35em;
+    align-items: flex-start;
+    gap: 0.5em;
 }
 
-#dropdown, #blatt, #submitBlatt, #handschrift { display: inline-flex; align-items: center; }
+#dropdown, #blatt, #submitBlatt, #handschrift { display: inline-flex; align-items: flex-start; }
 #lbl_blatt   { display: inline-block; }
 #blattInput  { width: 4em; }
 #handMenu    { width: 15em; }
-#handschrift { align-self: center; }
+
+/* Match select's internal text-left padding so versAnzeige lines up
+   with the option text visible in #buchMenu. */
+#versAnzeige { padding-left: 0.5em; }
 
 #blaettern1, #blaettern2, #blaettern3, #blaettern4 {
     display: inline-flex;
