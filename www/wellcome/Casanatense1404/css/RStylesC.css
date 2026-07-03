@@ -1,103 +1,124 @@
 @charset "utf-8";
-/* CSS Document */
 
-/* allgemeine Formatierungen */
-html, body { margin: 0; padding: 0; height: 100vh; overflow: hidden; background-color: #F0F0F0; }
-p	    		{ margin-top:5px; margin-bottom:15px; }
-h1 				{ font-family:Arial, Helvetica, sans-serif; font-size: 14px; font-weight: bold; margin-top:50px; }
-h2				{ font-family:Arial, Helvetica, sans-serif; font-size: 13px; font-weight: normal; padding-top:5px; padding-left:15px }
-a:link 		{ color:#000000; font-weight:bold; text-decoration:none; }
-a:visited	{ color:#000000; font-weight:bold; text-decoration:none; }
-a:hover		{ color:#8B1B31; font-weight:bold; text-decoration:none; }
-a:active	{ color:#000000; font-weight:bold; text-decoration:none; }
-a:focus		{ color:#000000; font-weight:bold; text-decoration:none; }
+/* ---------------------- reset + page frame ---------------------- */
+html { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: inherit; }
 
-/* Positionierung Navigation */
-#bezeichnung    { z-index:1; margin-left: 4px;}
-#start 			{ position:absolute; top:39px; left:20px; z-index:1; }
-#dropdown 		{ position:absolute; top:39px; left:10px; z-index:1; }
-#blaettern1 	{ position:absolute; top:42px; left:365px; width:32px; height:20px; z-index:1; }
-#blaettern2 	{ position:absolute; top:42px; left:395px; width:32px; height:20px; z-index:1; }
-#blaettern3 	{ position:absolute; top:42px; left:433px; width:32px; height:20px; z-index:1; }
-#blaettern4 	{ position:absolute; top:42px; left:460px; width:32px; height:20px; z-index:1; }
-#lbl_blatt 		{ position:absolute; top:41px; left:507px; z-index:1; }
-#blatt 			{ position:absolute; top:39px; left:539px; z-index:1; }
-#blattInput     {width:32pt;}
-#submitBlatt 	{ position:absolute; top:40px; left:594px;	z-index:1; }
-#lagensymbol 	{ position:absolute; top:20px; left:640px; z-index:1; }
-#handschrift 	{ position:absolute; top:38px; left:827px; z-index:1; width:10px; min-width:10px;}
-#handMenu       {width:230px;}
-
-/* 2. Zeile Navigation */
-#versAnzeige 	{ position:absolute; top:70px; left:10px; width:auto; height:20px; z-index:1; }
-#schreibAnzeige { position:absolute; top:70px; left:175px; width:auto; height:20px; z-index:1; }
-#verweise 		{ position:absolute; top:70px; left:365px; z-index:1; }
-#blattAnzeige 	{ position:absolute; top:70px; left:507px; width:auto; height:20px; z-index:1; }
-#lagenAnzeige 	{ position:absolute; top:70px; left:640px; width:auto; height:20px; z-index:1; }
-#navigation 	{ height: 78px; }
-#myContainer	{ margin-left: -10px; }
-
-.tooltip {
-    position: absolute;
-    z-index: 9999; /* Stellen Sie sicher, dass der Tooltip über anderen Elementen liegt */
-    background-color: #EEE4C6;
-    color: 000000;
-    padding: 3px;
-    font-family:Arial, Helvetica, sans-serif; font-size: 12px; font-weight: normal;
-    border: black solid 1px;
-    pointer-events: none; /* Dadurch wird sichergestellt, dass der Tooltip keine Mausereignisse abfängt */
+html, body {
+    margin: 0;
+    padding: 1em;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #F0F0F0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75em;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
+p  { margin-top: 5px; margin-bottom: 15px; }
+h1 { font-size: 14px; font-weight: bold; margin-top: 50px; }
+h2 { font-size: 13px; font-weight: normal; padding-top: 5px; padding-left: 15px; }
+a:link, a:visited, a:active, a:focus { color: #000000; font-weight: bold; text-decoration: none; }
+a:hover  { color: #8B1B31; font-weight: bold; text-decoration: none; }
 
-
-#osdSpread {
-    position: absolute;
-    top: 100px;
-    left: 0;
-    width: 100vw;
-    height: calc(100vh - 100px);
-    background: #F0F0F0;
-    z-index: 1;
-}
-
-/* Formatierung Navigationstext */
-.navText	    { font-family:Arial, Helvetica, sans-serif; font-size:10pt; text-decoration: none; margin-top:0px; margin-bottom:0px; }
-.navTextLink	{ font-family:Arial, Helvetica, sans-serif; font-size:10pt; text-decoration: none; margin-top:0px; margin-bottom:0px; }
-.red					{color:#8B1B31}
-
-.dynamisch		{ font-family:Arial, Helvetica, sans-serif; font-size:10pt; }
-/*.titel				{ font-family:Arial, Helvetica, sans-serif; font-size:12pt; font-weight: bold; color:#9E2922; }*/
-.titel				{ font-family:Arial, Helvetica, sans-serif; font-size:12pt; color:#8B1B31; }
-.fliesstext		{ font-family:Arial, Helvetica, sans-serif; font-size:10pt; margin-bottom:10px; margin-right:20px;  padding-left:15px}
-
-
+/* ---------------------- header row 1: home + title ---------------------- */
 .header-container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75em;
+    flex: 0 0 auto;
 }
 
 #startseite-icon-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  margin-right: 8px;
-  padding: 1pt;
-  border: 1pt solid #8B1B31;
-  border-radius: 6pt;
-  width: 12pt; 
-  height: 12pt;
-  transition: background-color 0.2s ease;
-  box-shadow: 2pt 2pt 4pt rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0.15em;
+    border: 1pt solid #8B1B31;
+    border-radius: 0.4em;
+    width: 1.5em;
+    height: 1.5em;
+    transition: background-color 0.2s ease;
+    box-shadow: 0.15em 0.15em 0.3em rgba(0, 0, 0, 0.2);
+    flex: 0 0 auto;
+}
+#startseite-icon-button:hover { background-color: #f5e9eb; }
+.icon { width: 1em; height: 1em; color: #8B1B31; }
+
+#bezeichnung { z-index: 1; }
+
+/* ---------------------- header rows 2+3: controls + status ----------------------
+   Row 2 = form controls (buchMenu, blattInput+submit, handMenu, 4 arrows).
+   Row 3 = status readouts (versAnzeige, schreibAnzeige, blattAnzeige, lagenAnzeige, lagensymbol).
+   The <form name="naviHSR"> spans row 2; the status divs are direct siblings
+   of the form inside #navigation and land on row 3 via grid auto-flow. */
+#navigation {
+    display: grid;
+    grid-template-columns: auto auto auto auto auto auto 1fr;
+    column-gap: 0.75em;
+    row-gap: 0.4em;
+    align-items: center;
+    flex: 0 0 auto;
+}
+#navigation > form { grid-column: 1 / -1; }
+
+form[name="naviHSR"] {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5em;
+    margin: 0;
 }
 
-#startseite-icon-button:hover {
-  background-color: #f5e9eb;
+#dropdown, #blatt, #submitBlatt, #handschrift { display: inline-flex; align-items: center; }
+#lbl_blatt   { display: inline-block; }
+#blattInput  { width: 4em; }
+#handMenu    { width: 15em; }
+
+#blaettern1, #blaettern2, #blaettern3, #blaettern4 {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+#blaettern1 img, #blaettern2 img, #blaettern3 img, #blaettern4 img { display: block; }
+
+#versAnzeige, #schreibAnzeige, #blattAnzeige, #lagenAnzeige {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+    white-space: nowrap;
 }
 
-.icon {
-  width: 12pt;
-  height: 12pt;
-  color: #8B1B31;
+#lagensymbol { display: inline-flex; align-items: center; }
+#lagensymbol img { display: block; max-height: 2em; }
+
+/* ---------------------- OSD stage ---------------------- */
+#osdSpread {
+    flex: 1 1 auto;
+    min-height: 0;
+    background: #F0F0F0;
 }
+
+/* ---------------------- tooltips ---------------------- */
+.tooltip {
+    position: absolute;
+    z-index: 9999;
+    background-color: #EEE4C6;
+    color: #000000;
+    padding: 3px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    font-weight: normal;
+    border: black solid 1px;
+    pointer-events: none;
+}
+
+/* ---------------------- text helpers ---------------------- */
+.navText, .navTextLink { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; text-decoration: none; margin: 0; }
+.red        { color: #8B1B31; }
+.dynamisch  { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; }
+.titel      { font-family: Arial, Helvetica, sans-serif; font-size: 12pt; color: #8B1B31; }
+.fliesstext { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; margin-bottom: 10px; margin-right: 20px; padding-left: 15px; }
