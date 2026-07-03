@@ -7,10 +7,10 @@
 */
 function blattInfo(blatt) {
 	switch(blatt) {
-		case "0r": lagenNr=""; lagenSymb="blind"; lagenName=""; konkordanz=""; schreiber=""; aktBuch = 0; alt = ""; break;
-		case "0v": lagenNr=""; lagenSymb="blind"; lagenName=""; konkordanz=""; schreiber=""; aktBuch = 0; alt = ""; break;
-		case "1r": lagenNr=""; lagenSymb="blind"; lagenName=""; konkordanz=""; schreiber=""; aktBuch = 0; alt = ""; break;
-		case "1v": lagenNr=""; lagenSymb="blind"; lagenName=""; konkordanz=""; schreiber=""; aktBuch = 0; alt = ""; break;
+		case "0r": lagenNr=""; lagenSymb="blind"; lagenName=""; konkordanz="";aktBuch = 0; alt = ""; break;
+		case "0v": lagenNr=""; lagenSymb="blind"; lagenName=""; konkordanz="";aktBuch = 0; alt = ""; break;
+		case "1r": lagenNr=""; lagenSymb="blind"; lagenName=""; konkordanz="";aktBuch = 0; alt = ""; break;
+		case "1v": lagenNr=""; lagenSymb="blind"; lagenName=""; konkordanz="";aktBuch = 0; alt = ""; break;
 		return;
 	}
 }

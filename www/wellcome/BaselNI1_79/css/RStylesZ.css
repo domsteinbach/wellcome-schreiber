@@ -49,34 +49,54 @@ a:hover  { color: #8B1B31; font-weight: bold; text-decoration: none; }
 
 #bezeichnung { z-index: 1; }
 
-/* ---------------------- header rows 2+3: controls + status ----------------------
-   Row 2 = form controls (buchMenu, blattInput+submit, handMenu, 4 arrows).
-   Row 3 = status readouts (versAnzeige, schreibAnzeige, blattAnzeige, lagenAnzeige, lagensymbol).
-   The <form name="naviHSR"> spans row 2; the status divs are direct siblings
-   of the form inside #navigation and land on row 3 via grid auto-flow. */
+/* ---------------------- header row 2: navigation ----------------------
+   Single flex row of 5 groups (left-to-right):
+     .hdr-book    — buchMenu (top) / versAnzeige (bottom)
+     .hdr-arrows  — the 4 blaettern arrows in one inline row
+     .hdr-blatt   — Blatt label + input + submit (top) / blattAnzeige (bottom)
+     .hdr-lage    — lagensymbol (top, larger) / lagenAnzeige (bottom)
+     #handschrift — manuscript switcher
+*/
 #navigation {
-    display: grid;
-    grid-template-columns: auto auto auto auto auto auto 1fr;
-    column-gap: 0.75em;
-    row-gap: 0.4em;
-    align-items: center;
     flex: 0 0 auto;
 }
-#navigation > form { grid-column: 1 / -1; }
 
 form[name="naviHSR"] {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: flex-start;
     flex-wrap: wrap;
-    gap: 0.5em;
+    gap: 1em;
     margin: 0;
+}
+
+.hdr-book, .hdr-blatt, .hdr-lage {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25em;
+}
+
+.hdr-arrows {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.15em;
+    align-self: center;
+}
+
+.hdr-blatt-input {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.35em;
 }
 
 #dropdown, #blatt, #submitBlatt, #handschrift { display: inline-flex; align-items: center; }
 #lbl_blatt   { display: inline-block; }
 #blattInput  { width: 4em; }
 #handMenu    { width: 15em; }
+#handschrift { align-self: center; }
 
 #blaettern1, #blaettern2, #blaettern3, #blaettern4 {
     display: inline-flex;
@@ -85,14 +105,24 @@ form[name="naviHSR"] {
 }
 #blaettern1 img, #blaettern2 img, #blaettern3 img, #blaettern4 img { display: block; }
 
-#versAnzeige, #schreibAnzeige, #blattAnzeige, #lagenAnzeige {
+#versAnzeige, #blattAnzeige, #lagenAnzeige {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 10pt;
     white-space: nowrap;
 }
 
-#lagensymbol { display: inline-flex; align-items: center; }
-#lagensymbol img { display: block; max-height: 2em; }
+#lagensymbol {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 5em;
+    height: 3.5em;
+}
+#lagensymbol img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+}
 
 /* ---------------------- OSD stage ---------------------- */
 #osdSpread {

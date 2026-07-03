@@ -521,18 +521,10 @@ function bildAnzeigeDS() {
 
 	var blatt = curSlide + addChar + "v";
 	blattInfo(blatt); // Info Verso
-	var schreibv = schreiber
 
 	blatt = nexSlide + nexChar + "r";
 	blattInfo(blatt); // Info Recto
-	var schreibr = schreiber
 
-	if (schreibv == schreibr) {
-		schreiber = schreibv
-	}
-	else {
-		schreiber = schreibv + " / " + schreibr
-	}
 
 	blatt = curSlide + addChar + "";
 	blattInfoDS(blatt); //Info Recto/Verso
@@ -567,7 +559,6 @@ function bildAnzeigeDS() {
 
 	document.getElementById('blattAnzeige').innerHTML = seitenAngabe;
 	document.getElementById('versAnzeige').innerHTML = konkordanz;
-	document.getElementById('schreibAnzeige').innerHTML = schreiber;
 	window.document.ImgLagensymbol.src = "../Lagensymbole/Doppelseite/" + lagenSymb + ".gif";
 	document.getElementById('lagenAnzeige').innerHTML = lagenAngabe;
 	document.naviHSR.selectBook.selectedIndex = buchAuswahl;

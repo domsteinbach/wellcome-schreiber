@@ -35,7 +35,8 @@
     </div>
 	<div id="navigation">
 		<form name="naviHSR">
-			<div id="dropdown">
+			<div class="hdr-book">
+				<div id="dropdown">
 				<select name="selectBook" id="buchMenu" class="Auswahl">
 					<option value="javascript:">Abschnitt w&auml;hlen</option>
 					<option value="r1">Kräuterbuch ‚Circa instans‘</option>
@@ -53,20 +54,31 @@
 					<option value="v35">Tugenden und Laster</option>-->
 				</select>
 			</div>
+				<div id="versAnzeige" class="dynamisch"></div>
+			</div>
 
 
 
-			<div id="blaettern1"><img border="0" src="../images/backward_book.gif"></div>
+			<div class="hdr-arrows"><div id="blaettern1"><img border="0" src="../images/backward_book.gif"></div>
 			<div id="blaettern2"><img border="0" src="../images/backward_page.gif"></div>
 			<div id="blaettern3"><img border="0" src="../images/forward_page.gif"></div>
-			<div id="blaettern4"><img border="0" src="../images/forward_book.gif"></div>
+			<div id="blaettern4"><img border="0" src="../images/forward_book.gif"></div></div>
 
-			<div class="navText" id="lbl_blatt">Blatt</div>
+			<div class="hdr-blatt">
+				<div class="hdr-blatt-input"><div class="navText" id="lbl_blatt">Blatt</div>
 			<div id="blatt">
 				<input type="text" name="Blatt" maxlength="6" class="Feld" id="blattInput" />
 			</div>
 			<div id="submitBlatt">
 				<img border="0" src="../images/submitSuchen.gif" alt="Blatt finden" id="submitBlattImg" />
+			</div></div>
+				<div id="blattAnzeige" class="dynamisch"></div>
+			</div>
+
+			<div class="hdr-lage">
+				<div id="lagensymbol"><img name="ImgLagensymbol" src="../images/Lagensymbole/blind.gif" alt="Lagensymbol" />
+		</div>
+				<div id="lagenAnzeige" class="dynamisch"></div>
 			</div>
 
 			<div id="handschrift">
@@ -81,14 +93,6 @@
 				</select>
 			</div>
 		</form>
-
-		<!-- Navigation 2. Zeile -->
-		<div id="versAnzeige" class="dynamisch"></div>
-		<div id="schreibAnzeige" class="dynamisch"></div>
-		<div id="blattAnzeige" class="dynamisch"></div>
-		<div id="lagenAnzeige" class="dynamisch"></div>
-		<div id="lagensymbol"><img name="ImgLagensymbol" src="../images/Lagensymbole/blind.gif" alt="Lagensymbol" />
-		</div>
 	</div>
 	<div id="osdSpread"></div>
 </body>
