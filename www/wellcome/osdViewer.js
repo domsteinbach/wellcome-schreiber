@@ -176,11 +176,12 @@
       //     drag response, not sluggish.
       //   springStiffness — how tightly the view clamps to the target.
       //     Higher = less bouncy/wobbly. Default 6.5, we want firmer.
-      //   zoomPerScroll — wheel-zoom step size. Default 1.2 (each
-      //     notch scales by 20%, feels chunky). 1.05 = fine, smooth.
+      //   zoomPerScroll — wheel-zoom step size. Default 1.2 (chunky).
+      //     1.15 = brisk but smooth; large IIIF rasters need to
+      //     traverse a lot of scale in few wheel notches.
       animationTime: 0.4,
       springStiffness: 15,
-      zoomPerScroll: 1.05,
+      zoomPerScroll: 1.15,
     });
 
     // Attach failure handlers per-item after they open.
