@@ -6,7 +6,7 @@ html { box-sizing: border-box; }
 
 html, body {
     margin: 0;
-    padding: 1em;
+    padding: 0.4em;
     height: 100vh;
     overflow: hidden;
     background-color: #F0F0F0;
