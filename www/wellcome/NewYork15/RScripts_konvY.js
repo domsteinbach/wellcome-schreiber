@@ -1041,8 +1041,7 @@ function bildAnzeigeDS() {
 	document.getElementById('lagenAnzeige').innerHTML = lagenAngabe;
 	document.naviHSR.selectBook.selectedIndex = buchAuswahl;
 	document.images['imgFaksimile'].src = "../Lagensymbole/Doppelseite/blind.gif";
-	document.images['imgFaksimilev'].src = bildURLv;
-	document.images['imgFaksimiler'].src = bildURLr;
+	renderSpread('osdSpread', bildURLv, bildURLr);
 
 	if (rvKom != 0) {
 		window.document.getElementById('bildbeschreibung').style.visibility = 'visible';

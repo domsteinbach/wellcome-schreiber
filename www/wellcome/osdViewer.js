@@ -27,19 +27,55 @@
   var SPREAD_GAP = 0.02;
   var activeViewer = null;
 
+  // Values the legacy code uses to mean "no image on this side". These
+  // must not trigger a lookup or an error overlay — they are the
+  // designed-blank sentinels for Einband/first-recto/last-verso etc.
+  var BLANK_SENTINELS = /(?:^|\/)(?:transparent\.png|blind\.gif|#)$/i;
+
   function pathToKey(pathValue) {
     if (!pathValue) return null;
-    return pathValue.replace(/^\d+\//, '').replace(/\.jpg$/i, '');
+    if (BLANK_SENTINELS.test(pathValue)) return null;
+    return pathValue.replace(/^\d+\//, '').replace(/\.(jpg|jpeg|png)$/i, '');
+  }
+
+  function isBlankPath(pathValue) {
+    return !pathValue || BLANK_SENTINELS.test(pathValue);
+  }
+
+  // Collect every window.blattInfoIIIF_* mapping in script-tag insertion
+  // order. Consumers place the manuscript-native mapping's <script> tag
+  // before any fallback tags (e.g. NewYork15's page loads
+  // blattInfoIIIF_Y.js first, then blattInfoIIIF_W.js for the Wellcome49
+  // stems that the legacy code reuses at the Einband edges).
+  //
+  // Cached after the first call — mappings are static script-tag globals.
+  var _mappingCache = null;
+  function collectMappings() {
+    if (_mappingCache) return _mappingCache;
+    var mappings = [];
+    var keys = Object.keys(window);
+    for (var i = 0; i < keys.length; i++) {
+      var name = keys[i];
+      if (/^blattInfoIIIF_[A-Z]$/.test(name) && window[name] && typeof window[name] === 'object') {
+        mappings.push({ name: name, map: window[name] });
+      }
+    }
+    _mappingCache = mappings;
+    return mappings;
   }
 
   function lookupGuid(key) {
     if (!key) return null;
-    var map = window.blattInfoIIIF_B;
-    if (!map) {
-      console.warn('[osdViewer] window.blattInfoIIIF_B not loaded');
+    var mappings = collectMappings();
+    if (mappings.length === 0) {
+      console.warn('[osdViewer] no window.blattInfoIIIF_* mapping loaded');
       return null;
     }
-    return map[key] || null;
+    for (var i = 0; i < mappings.length; i++) {
+      var hit = mappings[i].map[key];
+      if (hit) return hit;
+    }
+    return null;
   }
 
   function infoJsonUrl(guid) {
@@ -88,15 +124,17 @@
     }
     containerEl.innerHTML = '';
 
-    var leftKey = pathToKey(leftPath);
-    var rightKey = pathToKey(rightPath);
-    var leftGuid = lookupGuid(leftKey);
-    var rightGuid = lookupGuid(rightKey);
+    var leftBlank = isBlankPath(leftPath);
+    var rightBlank = isBlankPath(rightPath);
+    var leftKey = leftBlank ? null : pathToKey(leftPath);
+    var rightKey = rightBlank ? null : pathToKey(rightPath);
+    var leftGuid = leftKey ? lookupGuid(leftKey) : null;
+    var rightGuid = rightKey ? lookupGuid(rightKey) : null;
 
-    if (!leftGuid) {
+    if (leftKey && !leftGuid) {
       console.warn('[osdViewer] no mapping for left stem: ' + leftKey);
     }
-    if (!rightGuid) {
+    if (rightKey && !rightGuid) {
       console.warn('[osdViewer] no mapping for right stem: ' + rightKey);
     }
 
@@ -149,11 +187,13 @@
       console.warn('[osdViewer] tile-load-failed', evt);
     });
 
-    // If a side's GUID was missing, mark it in the overlay layer.
-    if (!leftGuid) {
+    // If a side's GUID was missing, mark it in the overlay layer. Blank
+    // sentinels (transparent.png / blind.gif) are intentional — skip the
+    // overlay so those sides read as designed-blank, not as errors.
+    if (!leftGuid && !leftBlank) {
       showSideError(containerEl, 'left', leftKey ? ('No IIIF mapping for ' + leftKey) : 'No image');
     }
-    if (!rightGuid) {
+    if (!rightGuid && !rightBlank) {
       showSideError(containerEl, 'right', rightKey ? ('No IIIF mapping for ' + rightKey) : 'No image');
     }
   };
