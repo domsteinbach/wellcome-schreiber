@@ -117,18 +117,14 @@ form[name="naviHSR"] {
 }
 
 #lagensymbol {
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-    width: 5em;
-    height: 3.5em;
+    display: block;
+    width: 128px;
+    height: 39px;
 }
 #lagensymbol img {
     display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: top left;
+    width: 128px;
+    height: 39px;
 }
 
 /* ---------------------- OSD stage ---------------------- */
@@ -137,6 +133,10 @@ form[name="naviHSR"] {
     min-height: 0;
     background: #F0F0F0;
 }
+#osdSpread .openseadragon-canvas,
+#osdSpread canvas { cursor: grab; }
+#osdSpread .openseadragon-canvas:active,
+#osdSpread canvas:active { cursor: grabbing; }
 
 /* ---------------------- tooltips ---------------------- */
 .tooltip {

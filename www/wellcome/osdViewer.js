@@ -170,6 +170,11 @@
       collectionMode: false,
       crossOriginPolicy: 'Anonymous',
       ajaxWithCredentials: false,
+      // Snappier, more direct pan/zoom. animationTime is how long OSD
+      // takes to catch up with input; springStiffness is how tightly
+      // it clamps to the target (higher = less glide).
+      animationTime: 0.2,
+      springStiffness: 20,
     });
 
     // Attach failure handlers per-item after they open.
