@@ -173,65 +173,6 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("blaettern4").addEventListener("click", function() {
         goNextBook();
     });
-	document.getElementById("g50").addEventListener("mouseover", function() {
-        Tip('50%-Größe anzeigen');
-    });
-
-    document.getElementById("g50").addEventListener("mouseout", function() {
-        UnTip();
-    });
-
-    document.getElementById("g50").addEventListener("click", function() {
-        zoom50();
-    });
-
-    document.getElementById("g100").addEventListener("mouseover", function() {
-        Tip('100%-Größe anzeigen');
-    });
-
-    document.getElementById("g100").addEventListener("mouseout", function() {
-        UnTip();
-    });
-
-    document.getElementById("g100").addEventListener("click", function() {
-        zoom100();
-    });
-
-    document.getElementById("g150").addEventListener("mouseover", function() {
-        Tip('150%-Größe anzeigen');
-    });
-
-    document.getElementById("g150").addEventListener("mouseout", function() {
-        UnTip();
-    });
-
-    document.getElementById("g150").addEventListener("click", function() {
-        zoom150();
-    });
-
-    document.getElementById("zoomminus").addEventListener("mouseover", function() {
-        Tip('Zoom -');
-    });
-
-    document.getElementById("zoomminus").addEventListener("mouseout", function() {
-        UnTip();
-    });
-
-    document.getElementById("zoomminus").addEventListener("click", function() {
-        zoomout();
-    });
-
-    document.getElementById("zoomplus").addEventListener("mouseover", function() {
-        Tip('Zoom +');
-    });
-
-    document.getElementById("zoomplus").addEventListener("mouseout", function() {
-        UnTip();
-    });
-
-    document.getElementById("zoomplus").addEventListener("click", function() {
-        zoomin();
-    });
 
 	
 	document.getElementById("startseite-icon-button").addEventListener("mouseover", function () {
@@ -299,19 +240,6 @@ function TasteGedrueckt(Ereignis) {
 }
 
 document.onkeydown = TasteGedrueckt;
-
-
-function zoomin() {
-	var GFG = document.getElementById("imgFaksimile");
-	var currWidth = GFG.clientWidth;
-	GFG.style.width = (currWidth + 100) + "px";
-}
-
-function zoomout() {
-	var GFG = document.getElementById("imgFaksimile");
-	var currWidth = GFG.clientWidth;
-	GFG.style.width = (currWidth - 100) + "px";
-}
 
 //--------------------------------------------------------------
 
@@ -907,10 +835,6 @@ function bildAnzeigeES() {
 		window.document.getElementById('miniaturansichtHell').style.visibility='visible';
 	}
 
-		window.document.getElementById('zoomminus').style.visibility='visible';
-		window.document.getElementById('zoomminusHell').style.visibility='hidden';
-		window.document.getElementById('zoomplus').style.visibility='visible';
-		window.document.getElementById('zoomplusHell').style.visibility='hidden';
 
 		window.defaultStatus = "Berner Parzival-Handschrift, " + blattAngabe + "  |  Bildgr" + oesz +"e: " + zoom + "%";return true;
 	}	
@@ -1070,88 +994,8 @@ function bildAnzeigeDS() {
 		window.document.getElementById('miniaturansichtHell').style.visibility='visible';
 	}
 
-	window.document.getElementById('zoomminus').style.visibility='hidden';
-	window.document.getElementById('zoomminusHell').style.visibility='visible';
-	window.document.getElementById('zoomplus').style.visibility='hidden';
-	window.document.getElementById('zoomplusHell').style.visibility='visible';
 
 	window.defaultStatus = "Berner Parzival-Handschrift, " + seitenAngabe + "  |  Bildgr" + oesz +"e: " + zoom + "%";return true;
-}
-
-
-function zoom150() {
-	document.getElementById("imgFaksimile").style.width = "auto";
-	switch (Number(zoom)) {
-
-		//case 50: if((curSlide == "-2") && (rectoVerso == "r")) {break;} else {rectoVerso ="v"; curSlide--;	linkeSeite = curSlide + rectoVerso;	break;}
-		case 50: break
-		case 100: break;
-		case 150: return; break;
-
-	}
-
-	zoom = 150; 
-	bildAnzeigeES();
-}
-
-
-function zoom100() {
-	document.getElementById("imgFaksimile").style.width = "auto";
-	switch (Number(zoom)) {
-
-		case 50: 
-		//if((curSlide == "-2") && (rectoVerso == "r")) {
-			break;
-		//} else {
-		//	rectoVerso ="v"; 
-		//	curSlide--;	
-		//	linkeSeite = curSlide + rectoVerso;	
-		//	break;
-		//}
-		case 100: return; break;
-		case 150: break;
-	}
-
-	zoom = 100;
-	bildAnzeigeES();	
-}
-
-
-function zoom50() {
-
-	//switch (true) {
-
-		//case  Number(zoom) > 50: if (rectoVerso == "v") {curSlide++}; break;
-		//case  Number(zoom) == 50: return; break;
-
-	//}
-
-	if ((rectoVerso == "r") && (curSlide > 0)){
-		if (addPage.has(parseInt(curSlide))) {					
-			if (addChar == "a") {
-				curSlide--;
-				addChar = "";
-			} else {
-				addChar = String.fromCodePoint(addChar.charCodeAt(0)-1);
-				if (addChar == "j") {
-					addChar = "i";
-				}
-			}
-		} else if (addChar == "Z") {
-			addChar = "";
-		} else {
-			curSlide--;
-			if ((ZPage.indexOf(parseInt(curSlide)) != -1)) {
-				addChar = "Z";
-			}	
-		}
-		if ((addChar == "") && (addPage.has(parseInt(curSlide)))) {
-			addChar = addPage.get(parseInt(curSlide));
-		}
-		rectoVerso = "v";
-		}
-	zoom = 50;
-	bildAnzeigeDS();
 }
 
 function ansichtKonv() {

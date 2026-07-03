@@ -35,18 +35,10 @@ a:focus		{ color:#000000; font-weight:bold; text-decoration:none; }
 #verweise 		{ position:absolute; top:70px; left:365px; z-index:1; }
 #blattAnzeige 	{ position:absolute; top:70px; left:507px; width:auto; height:20px; z-index:1; }
 #lagenAnzeige 	{ position:absolute; top:70px; left:640px; width:auto; height:20px; z-index:1; }
-#g50 			{ position:absolute; top:70px; left:827px; width:auto; height:20px; z-index:1; }
-#g100 			{ position:absolute; top:70px; left:880px; width:auto; height:20px; z-index:1; }
-#g150 			{ position:absolute; top:70px; left:933px; width:auto; height:20px; z-index:1; }
-#zoomminus 			    { position:absolute; top:70px; left:983px; z-index:1; }
-#zoomminusHell 			{ position:absolute; top:70px; left:983px; z-index:1; }
-#zoomplus 			    { position:absolute; top:70px; left:1013px; z-index:1; }
-#zoomplusHell 			{ position:absolute; top:70px; left:1013px; z-index:1; }
 #miniaturansicht 		{ position:absolute; top:70px; left:1043px; visibility:hidden; z-index:5; }
 #miniaturansicht50 		{ position:absolute; top:70px; left:1043px; visibility:hidden; z-index:5; }
 #miniaturansichtHell 	{ position:absolute; top:70px; left:1043px; z-index:1; }
 #bildbeschreibung 		{ position:absolute; top:70px; left:1073px; visibility:hidden; z-index:5; }
-#bildbeschreibung50 	{ position:absolute; top:70px; left:1073px; visibility:hidden; z-index:5; }
 #bildbeschreibungHell 	{ position:absolute; top:70px; left:1073px; z-index:1; }
 #navigation 	{ height: 78px; }
 #myContainer	{ margin-left: -10px; }
