@@ -16,9 +16,6 @@ var addChar = '';
 //--------------------------------------------------------------
 
 var anzeigeModus = "";
-//var curSlide = parent.curSlideX;
-//var zoom = parent.zoomX;
-//var rectoVerso = parent.rectoVersoX;
 //var zusatz = "";
 //var bildURL = "";
 //var buch = 1;
@@ -50,7 +47,7 @@ var blattAngabe = "";
 var buchAuswahl = 2;
 var browser;
 var os;
-aktBuch = parent.aktBuch;
+var aktBuch = 0;
 var oesz = unescape("%F6%DF");
 var ae = unescape("%e4");
 
@@ -596,7 +593,6 @@ function bildAnzeigeDS() {
 	renderSpread('osdSpread', bildURLv, bildURLr);
 
 
-	window.defaultStatus = "Berner Parzival-Handschrift, " + seitenAngabe; return true;
 }
 
 function bildAnsichtKonv() {

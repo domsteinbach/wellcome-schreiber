@@ -16,9 +16,6 @@ var addChar = '';
 //--------------------------------------------------------------
 
 var anzeigeModus = "";
-//var curSlide = parent.curSlideX;
-//var zoom = parent.zoomX;
-//var rectoVerso = parent.rectoVersoX;
 //var zusatz = "";
 //var bildURL = "";
 //var buch = 1;
@@ -50,7 +47,7 @@ var blattAngabe = "";
 var buchAuswahl = 2;
 var browser;
 var os;
-aktBuch = parent.aktBuch;
+var aktBuch = 0;
 var oesz = unescape("%F6%DF");
 var ae = unescape("%e4");
 
@@ -577,59 +574,32 @@ function bildAnzeigeDS() {
 	renderSpread('osdSpread', bildURLv, bildURLr);
 
 
-	window.defaultStatus = "Berner Parzival-Handschrift, " + seitenAngabe + "  |  Bildgr" + oesz + "e: " + zoom + "%"; return true;
 }
 
 
 function bildAnsichtKonv() {
-
-	// Prüfen auf Parameter
-
+	// Parse ?<blatt> query parameter (e.g. ?001r) for deep-linking.
 	var strHref = window.location.href;
-	// wenn Parameter für Seite angegeben werden
 	if (strHref.indexOf("?") > -1) {
-		//alert("parameter");
 		var strQueryString = strHref.substr(strHref.indexOf("?") + 1).toLowerCase();
-		var aQueryString = strQueryString.split("&");
-		var strQueryBlatt = aQueryString[0];
-		var strQueryGroesse = aQueryString[1];
-		var strQueryAnsicht = aQueryString[2];
+		var strQueryBlatt = strQueryString.split("&")[0];
 
 		for (i = 0; i < 2; i++) {
 			if (strQueryBlatt.charAt(0) == "0") {
 				strQueryBlatt = strQueryBlatt.substring(1, strQueryBlatt.length);
 			}
 		}
-		addChar = ""
+		addChar = "";
 		curSlide = strQueryBlatt.substring(0, strQueryBlatt.length - 1);
 		rectoVerso = strQueryBlatt.substring(strQueryBlatt.length - 1, strQueryBlatt.length);
-		zoom = Number(strQueryGroesse);
 		if (isNaN(curSlide)) {
 			addChar = strQueryBlatt.substring(strQueryBlatt.length - 2, strQueryBlatt.length - 1);
 			curSlide = strQueryBlatt.substring(0, strQueryBlatt.length - 2);
 		}
-		if (isNaN(strQueryGroesse)) {
-			zoom = 100;
-		} else {
-			zoom = Number(strQueryGroesse);
-		}
-		if (zoom == 50 && rectoVerso == "v") {
+		if (rectoVerso == "v") {
 			curSlide = ++curSlide;
 		}
-		//alert("curSlide: " + curSlide + " rectoVerso: " + rectoVerso + " zoom: " + zoom);
-		/*if (strQueryAnsicht == "cod") {
-			window.RImage.location.href = "image_konv.html";
-			window.frames["navigation"].location.href = "navigation_konv.html";
-			ansicht = "konv";
-		} else {
-			window.RImage.location.href = "image_miniatur.html";
-			window.navigation.location.href = "navigation_miniaturen.html";
-			ansicht = "miniatur";
-		}*/
 	}
-
-	//alert("curSlide: " + curSlide + ", ansicht: " + ansicht + ", zoomStufe: " + zoom + ", rectoVerso: " + rectoVerso);
-		//alert("doppelseitig");
 	bildAnzeigeDS();
 }
 
