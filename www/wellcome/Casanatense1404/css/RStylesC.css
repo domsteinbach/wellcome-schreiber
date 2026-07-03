@@ -49,33 +49,6 @@ a:focus		{ color:#000000; font-weight:bold; text-decoration:none; }
 }
 
 
-#flexcontainer {
-    position:absolute;
-    top:100px; 
-    left:10px;
-    font-size: 0;
-    white-space: nowrap;
-}
-
-#containerv, #containerr {
-    overflow: hidden;
-    margin: 0; 
-    padding: 0; 
-    display: inline-block; 
-    vertical-align: top; 
-}
-
-#containerv img, #containerr img {
-    max-width: 100%; 
-    height: auto; 
-}
-
-
-#container 		{ position:absolute; top:100px; left:10px; width:auto; height:auto; z-index:1; }
-/*
-#containerv 	{ position:absolute; top:100px; left:10px; width:auto; height:auto; z-index:1; }
-#containerr 	{ position:absolute; top:100px; left:460px; width:auto; height:auto; z-index:1; }
-*/
 
 #osdSpread {
     position: absolute;
