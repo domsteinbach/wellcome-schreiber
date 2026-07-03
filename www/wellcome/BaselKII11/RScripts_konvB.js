@@ -191,29 +191,7 @@ function UnTip() {
     }
 }
 
-function TasteGedrueckt(Ereignis) {
-	if (navigator.appName == "Netscape") {
-		if (Ereignis.which == 37) {
-			parent.navigation.goPrevPage();
-		}
-		if (Ereignis.which == 39) {
-			parent.navigation.goNextPage();
-		}
-		return true;
-	}
-	if (navigator.appName == "Microsoft Internet Explorer") {
-		if (window.event.keyCode == 37) {
-			parent.navigation.goPrevPage();
-			return true;
-		}
-		if (window.event.keyCode == 39) {
-			parent.navigation.goNextPage();
-			return true;
-		}
-	}
-}
 
-document.onkeydown = TasteGedrueckt;
 
 //--------------------------------------------------------------
 
@@ -262,70 +240,6 @@ function MM_jumpMenuParts() {
 	}
 }
 
-function MM_jumpMenuPartsZ() {
-	if (document.naviHSR.selectBook.value != "javascript:") {
-		if (document.naviHSR.selectBook.selectedIndex == 1) {
-			var temp = document.naviHSR.selectBook.value;
-			rectoVerso = temp.substring(0, 1);
-			addChar = '';
-			curSlide = 1;
-			document.naviHSR.selectBook.selectedIndex = 1;
-		} else {
-			var buch = document.naviHSR.selectBook.value;
-			rectoVerso = buch.substring(0, 1);
-			addChar = '';
-			curSlide = parseInt(buch.substring(1));
-			document.naviHSR.selectBook.selectedIndex = 0;
-		}
-		//if (rectoVerso=="v") {curSlide++;}
-		bildAnzeigeZoom();
-	}
-}
-
-function MM_jumpVerweise() {
-	if (document.naviHSR.selectVerweise.value != "javascript:") {
-
-		var temp = document.naviHSR.selectVerweise.value;
-		rectoVerso = temp.substring(0, 1);
-		addChar = '';
-		curSlide = parseInt(temp.substring(1));
-		if (isNaN(curSlide)) {
-			addChar = temp.substring(1, 2);
-			curSlide = parseInt(temp.substring(2));
-		}
-		document.naviHSR.selectVerweise.selectedIndex = 0;
-
-		if (rectoVerso == "r") {
-			if (addPage.has(parseInt(curSlide))) {
-				if (addChar == "a") {
-					curSlide--;
-					addChar = "";
-				} else {
-					addChar = String.fromCodePoint(addChar.charCodeAt(0) - 1);
-					if (addChar == "j") {
-						addChar = "i";
-					}
-				}
-			} else if (addChar == "Z") {
-				addChar = "";
-			} else {
-				curSlide--;
-				if ((ZPage.indexOf(parseInt(curSlide)) != -1)) {
-					addChar = "Z";
-				}
-			}
-			if ((addChar == "") && (addPage.has(parseInt(curSlide)))) {
-				addChar = addPage.get(parseInt(curSlide));
-			}
-			rectoVerso = "v";
-		}
-		bildAnzeigeDS();
-
-		window.localStorage.setItem('localStoreCurSlide', curSlide);
-		window.localStorage.setItem('localStoreRectoVerso', rectoVerso);
-		window.localStorage.setItem('localStoreAddChar', addChar);
-	}
-}
 
 function MM_jumpHandschrift() {
 
@@ -553,56 +467,6 @@ function checkSeitenEingabe() {
 	document.naviHSR.Blatt.value = "";
 }
 
-function bildAnzeigeZoom() {
-	//alert ("localZoom: " + window.localStorage.getItem('localStoreCurSlide'));
-	var blatt = curSlide + addChar + rectoVerso + "";
-	blattInfo(blatt);
-	var lageTxt = ". Lage, ";
-	if (lagenNr != '') {
-		lagenNr = lagenNr + lageTxt;
-	}
-
-	// Zusammensetzen des Dateinamens der Bilder
-
-	var curSlideStr = curSlide += '';
-
-	switch (curSlideStr.length) {
-
-		case 1: zusatz = "00"; break;
-		case 2: zusatz = "0"; break;
-		default: zusatz = ""; break;
-
-	}
-
-	var temp = "Basel_KII11_" + zusatz + curSlide + addChar + rectoVerso;
-
-	switch (curSlide) {
-
-		//case "0": seitenAngabe = "Vorsatzbl. / Bl. Ir"; lagenAngabe = ""; temp = "R000"; buchAuswahl = 0; break;
-		//case "1": seitenAngabe = "Bl. Iv / Bl. " + curSlide + "r"; lagenAngabe = lagenNr + lageTxt + lagenName; buchAuswahl = 2; break;
-		//case "181": seitenAngabe = "Bl. " + (curSlide-1) + "v / Vorsatzbl."; lagenAngabe = ""; buchAuswahl = aktBuch + 1; break;
-		//case "182": seitenAngabe = "Vorsatzbl. / Buchdeckel"; lagenAngabe = ""; temp = "R182"; buchAuswahl = 0; break;
-		//case "183": seitenAngabe = "Buchdeckel außen"; lagenAngabe = ""; temp = "R183"; buchAuswahl = 18; break;
-		//case "-1": seitenAngabe = "Buchdeckel / Vorsatzbl."; lagenAngabe = ""; temp = "Rvs001"; buchAuswahl = 0; break;
-		//case "-2": seitenAngabe = "Buchdeckel vorne"; lagenAngabe = ""; temp = "Rvs002"; buchAuswahl = 1; break;
-		default: seitenAngabe = "Bl. " + blatt; lagenAngabe = lagenNr + lagenName; buchAuswahl = aktBuch + 1; break;
-
-	}
-
-	Z.showImage("myContainer", temp, "zLogoVisible=0");
-
-	// Befüllen der Textfelder für Blatt- und Versnummer sowie der Lage bzw. des Lagensymbols
-	document.getElementById('blattAnzeige').innerHTML = seitenAngabe;
-	document.getElementById('versAnzeige').innerHTML = konkordanz;
-	document.getElementById('lagenAnzeige').innerHTML = lagenAngabe;
-	window.document.ImgLagensymbol.src = "../images/LagensymboleDoppelt/" + lagenSymb + ".gif";
-	document.naviHSR.selectBook.selectedIndex = buchAuswahl;
-
-
-	window.defaultStatus = "Berner Parzival-Handschrift, " + seitenAngabe;
-
-}
-
 
 function bildAnzeigeDS() {
 	var curSlideStr = curSlide += '';
@@ -767,93 +631,3 @@ function bildAnsichtKonv() {
 }
 
 
-function infoFenster(URL1) {
-	var breite = 600
-	var hoehe = 500
-	links = (screen.width - breite) / 2
-	oben = (screen.height - hoehe) / 4
-	F1 = open(URL1, "", "scrollbars=yes, resizable=yes, status=yes, width=" + breite + ",height=" + hoehe + ",top=" + oben + ",screenY=" + oben + ",left=" + links + ",screenX=" + links)
-}
-
-
-function grossFenster(URL2) {
-	var breite = screen.availWidth - 10;
-	var hoehe = screen.availHeight - 10;
-	links = 0
-	oben = 0
-	F1 = open(URL2, "", "scrollbars=yes, resizable=yes, status=yes, width=" + breite + ",height=" + hoehe + ",top=" + oben + ",screenY=" + oben + ",left=" + links + ",screenX=" + links)
-	F1.resizeTo(screen.availWidth, screen.availHeight);
-}
-
-
-function transkriptionen(URL3) {
-	var breite = screen.availWidth - 10;
-	var hoehe = screen.availHeight - 10;
-	links = 0
-	oben = 0
-	F1 = open(URL3, "", "scrollbars=yes, resizable=yes, status=yes, width=" + breite + ",height=" + hoehe + ",top=" + oben + ",screenY=" + oben + ",left=" + links + ",screenX=" + links)
-	F1.resizeTo(screen.availWidth, screen.availHeight);
-}
-
-
-function initialenInfoFenster(URL4) {
-	var breite = 500
-	var hoehe = 500
-	links = (screen.width - breite) / 2
-	oben = (screen.height - hoehe) / 4
-	F1 = open(URL4, "", "scrollbars=yes, resizable=yes, status=yes, width=" + breite + ",height=" + hoehe + ",top=" + oben + ",screenY=" + oben + ",left=" + links + ",screenX=" + links)
-}
-
-
-function erlFenster(URL5) {
-	var breite = 800
-	var hoehe = 500
-	links = (screen.width - breite) / 2
-	oben = (screen.height - hoehe) / 4
-	F1 = open(URL5, "", "scrollbars=yes, resizable=yes, status=yes, width=" + breite + ",height=" + hoehe + ",top=" + oben + ",screenY=" + oben + ",left=" + links + ",screenX=" + links)
-}
-
-
-function TasteGedrueckt(Ereignis) {
-
-	if (navigator.appName == "Netscape") {
-
-		if (Ereignis.which == 37) {
-
-			goPrevPage();
-
-		}
-
-		if (Ereignis.which == 39) {
-
-			goNextPage();
-
-		}
-
-		return true;
-
-	}
-
-	if (navigator.appName == "Microsoft Internet Explorer") {
-
-		if (window.event.keyCode == 37) {
-
-			goPrevPage();
-
-			return true;
-
-		}
-
-		if (window.event.keyCode == 39) {
-
-			goNextPage();
-
-			return true;
-
-		}
-
-	}
-
-}
-
-document.onkeydown = TasteGedrueckt;
