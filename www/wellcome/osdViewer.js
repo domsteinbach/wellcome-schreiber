@@ -181,7 +181,7 @@
       //     traverse a lot of scale in few wheel notches.
       animationTime: 0.4,
       springStiffness: 15,
-      zoomPerScroll: 1.3,
+      zoomPerScroll: 1.6,
     });
 
     // Attach failure handlers per-item after they open.
