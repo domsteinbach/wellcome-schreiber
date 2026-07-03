@@ -64,7 +64,6 @@ aktBuch = parent.aktBuch;
 var oesz=unescape("%F6%DF");
 var ae = unescape("%e4");
 var xmlDoc;
-var bildbeschreibungen;
 //systemWeiche();
 //importXML();
 localXML();
@@ -732,17 +731,9 @@ function bildAnzeigeZoom() {
 
 	//if (imgDescr) {
 
-		//window.document.getElementById('bildbeschreibung').style.visibility='visible';  
-		//window.document.getElementById('miniaturansicht').style.visibility='visible';
-		//window.document.getElementById('bildbeschreibungHell').style.visibility='hidden';  
-		//window.document.getElementById('miniaturansichtHell').style.visibility='hidden';
 
 	//} else {
 
-		//window.document.getElementById('bildbeschreibung').style.visibility='hidden';  
-		//window.document.getElementById('miniaturansicht').style.visibility='hidden';
-		//window.document.getElementById('bildbeschreibungHell').style.visibility='visible';  
-		//window.document.getElementById('miniaturansichtHell').style.visibility='visible';
 
 	//}
 
@@ -819,22 +810,6 @@ function bildAnzeigeES() {
 		document.images['imgFaksimiler'].src = "../Lagensymbole/Einzelseite/blind.gif";
 		document.images['imgFaksimile'].src = bildURL;
 		
-	if (imgKom) {
-		window.document.getElementById('bildbeschreibung').style.visibility='visible'; 
-		window.document.getElementById('bildbeschreibungHell').style.visibility='hidden';  
-	} else {
-		window.document.getElementById('bildbeschreibung').style.visibility='hidden'; 
-		window.document.getElementById('bildbeschreibungHell').style.visibility='visible';  
-	}
-
-	if (imgVer) {
-		window.document.getElementById('miniaturansicht').style.visibility='visible';
-		window.document.getElementById('miniaturansichtHell').style.visibility='hidden';
-	} else {
-		window.document.getElementById('miniaturansicht').style.visibility='hidden';
-		window.document.getElementById('miniaturansichtHell').style.visibility='visible';
-	}
-
 
 		window.defaultStatus = "Berner Parzival-Handschrift, " + blattAngabe + "  |  Bildgr" + oesz +"e: " + zoom + "%";return true;
 	}	
@@ -967,31 +942,21 @@ function bildAnzeigeDS() {
 	renderSpread('osdSpread', bildURLv, bildURLr);
 
 	if (rvKom != 0) {
-		window.document.getElementById('bildbeschreibung').style.visibility='visible'; 
-		window.document.getElementById('bildbeschreibungHell').style.visibility='hidden';
 		if (rvKom == 1) {
 			fenKom = curSlide + addChar + 'v';
 		}
 		else {
 			fenKom = nexSlide + nexChar + 'r'
 		}
-	} else {
-		window.document.getElementById('bildbeschreibung').style.visibility='hidden'; 
-		window.document.getElementById('bildbeschreibungHell').style.visibility='visible';  
 	}
 
 	if (rvVer != 0) {
-		window.document.getElementById('miniaturansicht').style.visibility='visible';
-		window.document.getElementById('miniaturansichtHell').style.visibility='hidden';
 		if (rvVer == 1) {
 			fenVer = curSlide + addChar + 'v';
 		}
 		else {
 			fenVer = nexSlide + nexChar + 'r'
 		}
-	} else {
-		window.document.getElementById('miniaturansicht').style.visibility='hidden';
-		window.document.getElementById('miniaturansichtHell').style.visibility='visible';
 	}
 
 
