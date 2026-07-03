@@ -170,11 +170,17 @@
       collectionMode: false,
       crossOriginPolicy: 'Anonymous',
       ajaxWithCredentials: false,
-      // Snappier, more direct pan/zoom. animationTime is how long OSD
-      // takes to catch up with input; springStiffness is how tightly
-      // it clamps to the target (higher = less glide).
-      animationTime: 0.2,
-      springStiffness: 20,
+      // Pan/zoom feel: smooth but not laggy.
+      //   animationTime — how long OSD takes to catch up with input.
+      //     0 = instant snap, 1.2 = OSD default (glidy). 0.4 = smooth
+      //     drag response, not sluggish.
+      //   springStiffness — how tightly the view clamps to the target.
+      //     Higher = less bouncy/wobbly. Default 6.5, we want firmer.
+      //   zoomPerScroll — wheel-zoom step size. Default 1.2 (each
+      //     notch scales by 20%, feels chunky). 1.05 = fine, smooth.
+      animationTime: 0.4,
+      springStiffness: 15,
+      zoomPerScroll: 1.05,
     });
 
     // Attach failure handlers per-item after they open.
