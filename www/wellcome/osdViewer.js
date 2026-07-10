@@ -227,4 +227,28 @@
     el.style.pointerEvents = 'none';
     return el;
   }
+
+  // Arrow-key page turning. Captured on the document before OSD's own
+  // key tracker can pan the canvas, so ← / → always turn pages instead.
+  // Skips when focus is in a form control (Blatt input, section select)
+  // or when modifier keys are held.
+  function isEditableTarget(t) {
+    if (!t) return false;
+    var tag = t.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+    return t.isContentEditable === true;
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (isEditableTarget(e.target)) return;
+
+    var handler = e.key === 'ArrowRight' ? window.goNextPage : window.goPrevPage;
+    if (typeof handler !== 'function') return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    handler();
+  }, true);
 })();
