@@ -27,6 +27,22 @@
   var SPREAD_GAP = 0.02;
   var activeViewer = null;
 
+  // Per-manuscript physical-size scale, keyed by the letter in
+  // blattInfoIIIF_<X>. 1.0 = the largest codex (fills the viewer as
+  // before). Values < 1 frame the spread inside a larger viewport rect
+  // so the folios appear smaller, hinting at the physical size relative
+  // to the largest codex. Container size, zoom-in headroom, and pan
+  // range are all preserved — only the initial frame changes.
+  // Placeholder eyeball values — replace with real ratios once physical
+  // folio dimensions are on hand (scale = thisMsWidth / largestMsWidth).
+  var MANUSCRIPT_SCALE = {
+    B: 0.5, // Basel KII11
+    W: 0.75, // Wellcome49
+    C: 1.0, // Casanatense1404
+    Z: 1.0, // Basel NI1_79
+    Y: 1.0, // NewYork15
+  };
+
   // Values the legacy code uses to mean "no image on this side". These
   // must not trigger a lookup or an error overlay — they are the
   // designed-blank sentinels for Einband/first-recto/last-verso etc.
@@ -80,6 +96,16 @@
 
   function infoJsonUrl(guid) {
     return IIIF_BASE + guid + '/info.json';
+  }
+
+  // The first mapping registered is the manuscript's own (any others are
+  // Einband fallbacks). Its letter identifies the manuscript.
+  function currentManuscriptScale() {
+    var mappings = collectMappings();
+    if (mappings.length === 0) return 1.0;
+    var letter = mappings[0].name.slice(-1);
+    var s = MANUSCRIPT_SCALE[letter];
+    return typeof s === 'number' && s > 0 ? s : 1.0;
   }
 
   function showSideError(containerEl, side, message) {
@@ -183,6 +209,29 @@
       springStiffness: 15,
       zoomPerScroll: 1.6,
     });
+
+    // Frame the spread inside a larger viewport rect when this manuscript
+    // is physically smaller than the reference codex. Runs after 'open'
+    // so viewport.getHomeBounds() reflects the actual tile-source layout.
+    var scale = currentManuscriptScale();
+    if (scale < 1.0) {
+      activeViewer.addHandler('open', function () {
+        var vp = activeViewer.viewport;
+        var natural = vp.getHomeBounds();
+        var inv = 1 / scale;
+        var w = natural.width * inv;
+        var h = natural.height * inv;
+        var x = natural.x - (w - natural.width) / 2;
+        var y = natural.y - (h - natural.height) / 2;
+        var framed = new OpenSeadragon.Rect(x, y, w, h);
+
+        // Override so the home button / goHome() returns to the framed
+        // view instead of OSD's tight fit around the tile sources.
+        vp.getHomeBounds = function () { return framed; };
+
+        vp.fitBounds(framed, true);
+      });
+    }
 
     // Attach failure handlers per-item after they open.
     activeViewer.addHandler('open-failed', function (evt) {
