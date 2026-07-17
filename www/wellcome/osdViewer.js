@@ -27,6 +27,22 @@
   var SPREAD_GAP = 0.02;
   var activeViewer = null;
 
+  // Suppress the browser's default focus outline on the OSD container
+  // and its focusable descendants. OSD sets tabindex on its wrapper and
+  // canvas so it can receive keyboard events; without this rule, clicking
+  // the viewer draws the browser's blue :focus ring around the canvas.
+  (function injectOsdFocusStyle() {
+    if (document.getElementById('osdViewer-focus-style')) return;
+    var style = document.createElement('style');
+    style.id = 'osdViewer-focus-style';
+    style.textContent =
+      '.openseadragon-container:focus,' +
+      '.openseadragon-container *:focus,' +
+      '.openseadragon-canvas:focus,' +
+      '.openseadragon-canvas canvas:focus{outline:none;}';
+    document.head.appendChild(style);
+  })();
+
   // Per-manuscript physical-size scale, keyed by the letter in
   // blattInfoIIIF_<X>. 1.0 = the largest codex (fills the viewer as
   // before). Values < 1 frame the spread inside a larger viewport rect
@@ -36,12 +52,45 @@
   // Placeholder eyeball values — replace with real ratios once physical
   // folio dimensions are on hand (scale = thisMsWidth / largestMsWidth).
   var MANUSCRIPT_SCALE = {
-    B: 0.5, // Basel KII11
-    W: 0.75, // Wellcome49
+    B: 0.82, // Basel KII11
+    W: 0.98, // Wellcome49
     C: 1.0, // Casanatense1404
-    Z: 1.0, // Basel NI1_79
-    Y: 1.0, // NewYork15
+    Z: 0.52, // Basel NI1_79
+    Y: 0.8, // NewYork15
   };
+
+  // Per-image crop overrides for scans with photographic artifacts
+  // (black shooting-stand borders, colour cards, etc.) that shouldn't be
+  // visible in the reading view. Keyed by IIIF GUID.
+  //
+  // Value is a IIIF pct: region — { x, y, w, h } as percentages of the
+  // master image. Example: { x: 5, y: 3, w: 92, h: 94 } crops 5% off the
+  // left, 3% off the top, keeps a 92% × 94% window in the middle.
+  //
+  // The master IIIF asset is untouched — the server derives the crop on
+  // the fly from the same info.json we'd otherwise use. Removing an entry
+  // instantly restores the uncropped view.
+  //
+  // Caveat: cropped folios use a simple {type:'image'} tile source (one
+  // JPEG at IIIF's `max` size) instead of a tiled deep-zoom pyramid. For
+  // the initial folio-sized view this is imperceptible; very deep zoom
+  // into a cropped folio will show JPEG resampling instead of finer tiles.
+  var GUID_CROP_PCT = {
+    // Example entry — replace percentages with the real borders once
+    // you've measured them from the master (1929×2560 px in this case).
+    // Uncomment and tune, or delete if not needed:
+    //'2a0370c3-5d97-48a1-ae64-ed5e02531a27': { x: 50, y: 50, w: 94, h: 96 },
+  };
+
+  function tileSourceForGuid(guid) {
+    var crop = GUID_CROP_PCT[guid];
+    if (!crop) return infoJsonUrl(guid); // uncropped, deep-zoomable
+    var region = 'pct:' + crop.x + ',' + crop.y + ',' + crop.w + ',' + crop.h;
+    return {
+      type: 'image',
+      url: IIIF_BASE + guid + '/' + region + '/max/0/default.jpg',
+    };
+  }
 
   // Values the legacy code uses to mean "no image on this side". These
   // must not trigger a lookup or an error overlay — they are the
@@ -164,29 +213,54 @@
       console.warn('[osdViewer] no mapping for right stem: ' + rightKey);
     }
 
-    var tileSources = [];
-    if (leftGuid) {
-      tileSources.push({
-        tileSource: infoJsonUrl(leftGuid),
-        x: 0,
-        y: 0,
-        width: 1,
-      });
-    }
-    if (rightGuid) {
-      tileSources.push({
-        tileSource: infoJsonUrl(rightGuid),
-        x: 1 + SPREAD_GAP,
-        y: 0,
-        width: 1,
-      });
-    }
-
-    if (tileSources.length === 0) {
+    if (!leftGuid && !rightGuid) {
       containerEl.textContent = 'No image available for this spread.';
       return;
     }
 
+    // Layout is height-normalized: both folios sit on the same top and
+    // bottom edge (viewport height = 1), and their widths follow each
+    // image's actual aspect ratio. This mirrors how a bifolium physically
+    // looks — folios of the same height, possibly differing widths — and
+    // prevents the shorter-image "gap at the bottom" that a width-based
+    // layout produces when the two scans have different aspect ratios.
+    //
+    // Requires each side's info.json ahead of OSD init so we know the
+    // aspect ratios. On fetch failure we fall back to width=1 for that
+    // side (its own aspect ratio will be discovered by OSD from the same
+    // info.json anyway, at the cost of possibly re-introducing a gap).
+    Promise.all([
+      leftGuid  ? fetchAspectRatio(leftGuid)  : Promise.resolve(null),
+      rightGuid ? fetchAspectRatio(rightGuid) : Promise.resolve(null),
+    ]).then(function (aspects) {
+      // aspects[1] (right AR) isn't needed here: OSD derives each source's
+      // displayed width from its own info.json when we pin height=1. We
+      // only need the left AR to know where the right source starts on x.
+      var leftAR = aspects[0]; // width / height, or null
+
+      var tileSources = [];
+      var leftWidthVU = leftAR || 1; // fallback: unit width if AR unknown
+      if (leftGuid) {
+        tileSources.push({
+          tileSource: tileSourceForGuid(leftGuid),
+          x: 0,
+          y: 0,
+          height: 1,
+        });
+      }
+      if (rightGuid) {
+        tileSources.push({
+          tileSource: tileSourceForGuid(rightGuid),
+          x: leftWidthVU + SPREAD_GAP,
+          y: 0,
+          height: 1,
+        });
+      }
+
+      startViewer(tileSources);
+    });
+
+    function startViewer(tileSources) {
     activeViewer = OpenSeadragon({
       element: containerEl,
       prefixUrl: 'https://cdn.jsdelivr.net/npm/openseadragon@4/build/openseadragon/images/',
@@ -208,6 +282,11 @@
       animationTime: 0.4,
       springStiffness: 15,
       zoomPerScroll: 1.6,
+      // Don't zoom on a plain click — the folios are static pages,
+      // not a map. Double-click still zooms as a discoverable gesture.
+      gestureSettingsMouse: { clickToZoom: false, dblClickToZoom: true },
+      gestureSettingsTouch: { clickToZoom: false, dblClickToZoom: true },
+      gestureSettingsPen:   { clickToZoom: false, dblClickToZoom: true },
     });
 
     // Frame the spread inside a larger viewport rect when this manuscript
@@ -248,9 +327,13 @@
       console.warn('[osdViewer] tile-load-failed', evt);
     });
 
+    } // end startViewer
+
     // If a side's GUID was missing, mark it in the overlay layer. Blank
     // sentinels (transparent.png / blind.gif) are intentional — skip the
     // overlay so those sides read as designed-blank, not as errors.
+    // Runs synchronously — the fetch above only affects tile-source
+    // placement, not whether we can flag a missing GUID.
     if (!leftGuid && !leftBlank) {
       showSideError(containerEl, 'left', leftKey ? ('No IIIF mapping for ' + leftKey) : 'No image');
     }
@@ -258,6 +341,42 @@
       showSideError(containerEl, 'right', rightKey ? ('No IIIF mapping for ' + rightKey) : 'No image');
     }
   };
+
+  // Fetch a IIIF info.json and return the *displayed* aspect ratio
+  // (width / height) for this GUID. If the GUID has a crop override in
+  // GUID_CROP_PCT, the aspect ratio reflects the cropped region — so the
+  // right folio's x-position stays flush with the visible edge of the
+  // left folio, not the original master's edge.
+  //
+  // Resolves to null on any failure so callers can fall back gracefully.
+  // Cached per GUID (renderSpread runs on every page turn; aspect ratios
+  // never change for a given image + crop combination).
+  var _aspectCache = {};
+  function fetchAspectRatio(guid) {
+    if (_aspectCache[guid] !== undefined) return Promise.resolve(_aspectCache[guid]);
+    return fetch(infoJsonUrl(guid))
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (info) {
+        if (!info || !info.width || !info.height) {
+          _aspectCache[guid] = null;
+          return null;
+        }
+        var w = info.width;
+        var h = info.height;
+        var crop = GUID_CROP_PCT[guid];
+        if (crop) {
+          w = info.width  * (crop.w / 100);
+          h = info.height * (crop.h / 100);
+        }
+        var ar = w / h;
+        _aspectCache[guid] = ar;
+        return ar;
+      })
+      .catch(function () {
+        _aspectCache[guid] = null;
+        return null;
+      });
+  }
 
   function makeInlineBanner(message) {
     var el = document.createElement('div');
