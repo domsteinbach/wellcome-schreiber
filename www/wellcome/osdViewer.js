@@ -59,6 +59,39 @@
     Y: 0.8, // NewYork15
   };
 
+  // Per-image crop overrides for scans with photographic artifacts
+  // (black shooting-stand borders, colour cards, etc.) that shouldn't be
+  // visible in the reading view. Keyed by IIIF GUID.
+  //
+  // Value is a IIIF pct: region — { x, y, w, h } as percentages of the
+  // master image. Example: { x: 5, y: 3, w: 92, h: 94 } crops 5% off the
+  // left, 3% off the top, keeps a 92% × 94% window in the middle.
+  //
+  // The master IIIF asset is untouched — the server derives the crop on
+  // the fly from the same info.json we'd otherwise use. Removing an entry
+  // instantly restores the uncropped view.
+  //
+  // Caveat: cropped folios use a simple {type:'image'} tile source (one
+  // JPEG at IIIF's `max` size) instead of a tiled deep-zoom pyramid. For
+  // the initial folio-sized view this is imperceptible; very deep zoom
+  // into a cropped folio will show JPEG resampling instead of finer tiles.
+  var GUID_CROP_PCT = {
+    // Example entry — replace percentages with the real borders once
+    // you've measured them from the master (1929×2560 px in this case).
+    // Uncomment and tune, or delete if not needed:
+    //'2a0370c3-5d97-48a1-ae64-ed5e02531a27': { x: 50, y: 50, w: 94, h: 96 },
+  };
+
+  function tileSourceForGuid(guid) {
+    var crop = GUID_CROP_PCT[guid];
+    if (!crop) return infoJsonUrl(guid); // uncropped, deep-zoomable
+    var region = 'pct:' + crop.x + ',' + crop.y + ',' + crop.w + ',' + crop.h;
+    return {
+      type: 'image',
+      url: IIIF_BASE + guid + '/' + region + '/max/0/default.jpg',
+    };
+  }
+
   // Values the legacy code uses to mean "no image on this side". These
   // must not trigger a lookup or an error overlay — they are the
   // designed-blank sentinels for Einband/first-recto/last-verso etc.
@@ -209,7 +242,7 @@
       var leftWidthVU = leftAR || 1; // fallback: unit width if AR unknown
       if (leftGuid) {
         tileSources.push({
-          tileSource: infoJsonUrl(leftGuid),
+          tileSource: tileSourceForGuid(leftGuid),
           x: 0,
           y: 0,
           height: 1,
@@ -217,7 +250,7 @@
       }
       if (rightGuid) {
         tileSources.push({
-          tileSource: infoJsonUrl(rightGuid),
+          tileSource: tileSourceForGuid(rightGuid),
           x: leftWidthVU + SPREAD_GAP,
           y: 0,
           height: 1,
@@ -309,17 +342,33 @@
     }
   };
 
-  // Fetch a IIIF info.json and return width/height (aspect ratio).
+  // Fetch a IIIF info.json and return the *displayed* aspect ratio
+  // (width / height) for this GUID. If the GUID has a crop override in
+  // GUID_CROP_PCT, the aspect ratio reflects the cropped region — so the
+  // right folio's x-position stays flush with the visible edge of the
+  // left folio, not the original master's edge.
+  //
   // Resolves to null on any failure so callers can fall back gracefully.
-  // Cached per GUID because renderSpread runs on every page turn but
-  // aspect ratios never change for a given image.
+  // Cached per GUID (renderSpread runs on every page turn; aspect ratios
+  // never change for a given image + crop combination).
   var _aspectCache = {};
   function fetchAspectRatio(guid) {
     if (_aspectCache[guid] !== undefined) return Promise.resolve(_aspectCache[guid]);
     return fetch(infoJsonUrl(guid))
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (info) {
-        var ar = (info && info.width && info.height) ? info.width / info.height : null;
+        if (!info || !info.width || !info.height) {
+          _aspectCache[guid] = null;
+          return null;
+        }
+        var w = info.width;
+        var h = info.height;
+        var crop = GUID_CROP_PCT[guid];
+        if (crop) {
+          w = info.width  * (crop.w / 100);
+          h = info.height * (crop.h / 100);
+        }
+        var ar = w / h;
         _aspectCache[guid] = ar;
         return ar;
       })
