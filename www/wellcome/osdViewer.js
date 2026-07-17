@@ -180,29 +180,54 @@
       console.warn('[osdViewer] no mapping for right stem: ' + rightKey);
     }
 
-    var tileSources = [];
-    if (leftGuid) {
-      tileSources.push({
-        tileSource: infoJsonUrl(leftGuid),
-        x: 0,
-        y: 0,
-        width: 1,
-      });
-    }
-    if (rightGuid) {
-      tileSources.push({
-        tileSource: infoJsonUrl(rightGuid),
-        x: 1 + SPREAD_GAP,
-        y: 0,
-        width: 1,
-      });
-    }
-
-    if (tileSources.length === 0) {
+    if (!leftGuid && !rightGuid) {
       containerEl.textContent = 'No image available for this spread.';
       return;
     }
 
+    // Layout is height-normalized: both folios sit on the same top and
+    // bottom edge (viewport height = 1), and their widths follow each
+    // image's actual aspect ratio. This mirrors how a bifolium physically
+    // looks — folios of the same height, possibly differing widths — and
+    // prevents the shorter-image "gap at the bottom" that a width-based
+    // layout produces when the two scans have different aspect ratios.
+    //
+    // Requires each side's info.json ahead of OSD init so we know the
+    // aspect ratios. On fetch failure we fall back to width=1 for that
+    // side (its own aspect ratio will be discovered by OSD from the same
+    // info.json anyway, at the cost of possibly re-introducing a gap).
+    Promise.all([
+      leftGuid  ? fetchAspectRatio(leftGuid)  : Promise.resolve(null),
+      rightGuid ? fetchAspectRatio(rightGuid) : Promise.resolve(null),
+    ]).then(function (aspects) {
+      // aspects[1] (right AR) isn't needed here: OSD derives each source's
+      // displayed width from its own info.json when we pin height=1. We
+      // only need the left AR to know where the right source starts on x.
+      var leftAR = aspects[0]; // width / height, or null
+
+      var tileSources = [];
+      var leftWidthVU = leftAR || 1; // fallback: unit width if AR unknown
+      if (leftGuid) {
+        tileSources.push({
+          tileSource: infoJsonUrl(leftGuid),
+          x: 0,
+          y: 0,
+          height: 1,
+        });
+      }
+      if (rightGuid) {
+        tileSources.push({
+          tileSource: infoJsonUrl(rightGuid),
+          x: leftWidthVU + SPREAD_GAP,
+          y: 0,
+          height: 1,
+        });
+      }
+
+      startViewer(tileSources);
+    });
+
+    function startViewer(tileSources) {
     activeViewer = OpenSeadragon({
       element: containerEl,
       prefixUrl: 'https://cdn.jsdelivr.net/npm/openseadragon@4/build/openseadragon/images/',
@@ -269,9 +294,13 @@
       console.warn('[osdViewer] tile-load-failed', evt);
     });
 
+    } // end startViewer
+
     // If a side's GUID was missing, mark it in the overlay layer. Blank
     // sentinels (transparent.png / blind.gif) are intentional — skip the
     // overlay so those sides read as designed-blank, not as errors.
+    // Runs synchronously — the fetch above only affects tile-source
+    // placement, not whether we can flag a missing GUID.
     if (!leftGuid && !leftBlank) {
       showSideError(containerEl, 'left', leftKey ? ('No IIIF mapping for ' + leftKey) : 'No image');
     }
@@ -279,6 +308,26 @@
       showSideError(containerEl, 'right', rightKey ? ('No IIIF mapping for ' + rightKey) : 'No image');
     }
   };
+
+  // Fetch a IIIF info.json and return width/height (aspect ratio).
+  // Resolves to null on any failure so callers can fall back gracefully.
+  // Cached per GUID because renderSpread runs on every page turn but
+  // aspect ratios never change for a given image.
+  var _aspectCache = {};
+  function fetchAspectRatio(guid) {
+    if (_aspectCache[guid] !== undefined) return Promise.resolve(_aspectCache[guid]);
+    return fetch(infoJsonUrl(guid))
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (info) {
+        var ar = (info && info.width && info.height) ? info.width / info.height : null;
+        _aspectCache[guid] = ar;
+        return ar;
+      })
+      .catch(function () {
+        _aspectCache[guid] = null;
+        return null;
+      });
+  }
 
   function makeInlineBanner(message) {
     var el = document.createElement('div');
