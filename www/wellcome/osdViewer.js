@@ -27,6 +27,22 @@
   var SPREAD_GAP = 0.02;
   var activeViewer = null;
 
+  // Suppress the browser's default focus outline on the OSD container
+  // and its focusable descendants. OSD sets tabindex on its wrapper and
+  // canvas so it can receive keyboard events; without this rule, clicking
+  // the viewer draws the browser's blue :focus ring around the canvas.
+  (function injectOsdFocusStyle() {
+    if (document.getElementById('osdViewer-focus-style')) return;
+    var style = document.createElement('style');
+    style.id = 'osdViewer-focus-style';
+    style.textContent =
+      '.openseadragon-container:focus,' +
+      '.openseadragon-container *:focus,' +
+      '.openseadragon-canvas:focus,' +
+      '.openseadragon-canvas canvas:focus{outline:none;}';
+    document.head.appendChild(style);
+  })();
+
   // Per-manuscript physical-size scale, keyed by the letter in
   // blattInfoIIIF_<X>. 1.0 = the largest codex (fills the viewer as
   // before). Values < 1 frame the spread inside a larger viewport rect
@@ -36,11 +52,11 @@
   // Placeholder eyeball values — replace with real ratios once physical
   // folio dimensions are on hand (scale = thisMsWidth / largestMsWidth).
   var MANUSCRIPT_SCALE = {
-    B: 0.5, // Basel KII11
-    W: 0.75, // Wellcome49
+    B: 0.82, // Basel KII11
+    W: 0.98, // Wellcome49
     C: 1.0, // Casanatense1404
-    Z: 1.0, // Basel NI1_79
-    Y: 1.0, // NewYork15
+    Z: 0.52, // Basel NI1_79
+    Y: 0.8, // NewYork15
   };
 
   // Values the legacy code uses to mean "no image on this side". These
@@ -208,6 +224,11 @@
       animationTime: 0.4,
       springStiffness: 15,
       zoomPerScroll: 1.6,
+      // Don't zoom on a plain click — the folios are static pages,
+      // not a map. Double-click still zooms as a discoverable gesture.
+      gestureSettingsMouse: { clickToZoom: false, dblClickToZoom: true },
+      gestureSettingsTouch: { clickToZoom: false, dblClickToZoom: true },
+      gestureSettingsPen:   { clickToZoom: false, dblClickToZoom: true },
     });
 
     // Frame the spread inside a larger viewport rect when this manuscript
