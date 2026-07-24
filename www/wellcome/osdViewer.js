@@ -67,29 +67,487 @@
   // master image. Example: { x: 5, y: 3, w: 92, h: 94 } crops 5% off the
   // left, 3% off the top, keeps a 92% × 94% window in the middle.
   //
-  // The master IIIF asset is untouched — the server derives the crop on
-  // the fly from the same info.json we'd otherwise use. Removing an entry
-  // instantly restores the uncropped view.
-  //
-  // Caveat: cropped folios use a simple {type:'image'} tile source (one
-  // JPEG at IIIF's `max` size) instead of a tiled deep-zoom pyramid. For
-  // the initial folio-sized view this is imperceptible; very deep zoom
-  // into a cropped folio will show JPEG resampling instead of finer tiles.
+  // The crop is applied *client-side* via OSD's tile-source `clip` rect,
+  // so the full deep-zoom pyramid stays in use — tiles outside the clip
+  // are simply never requested. Removing an entry instantly restores the
+  // uncropped view.
   var GUID_CROP_PCT = {
-    // Example entry — replace percentages with the real borders once
-    // you've measured them from the master (1929×2560 px in this case).
-    // Uncomment and tune, or delete if not needed:
-    //'2a0370c3-5d97-48a1-ae64-ed5e02531a27': { x: 50, y: 50, w: 94, h: 96 },
+    // --- Wellcome49 fold-side crop -----------------------------------
+    // Trims the neighbouring folio that peeks over the fold. Baseline
+    // values (recto x=8, w=92; verso x=0, w=91.5) fit the whole codex;
+    // hand-tune individual entries if a folio reveals more or less of
+    // the neighbour. Masters are all 5941×7127 px.
+    //   recto (r): fold sits on the LEFT  → crop left edge  (x = pct)
+    //   verso (v): fold sits on the RIGHT → crop right edge (x = 0, w -= pct)
+    // Einband entries have no fold and are omitted.
+    // Wellcome49_000r (r, 5941x7127px, x=8%, w=92%)
+    '5161979d-3ace-44d0-ba86-794dc660c455': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_000v (v, 5941x7127px, x=0%, w=91.5%)
+    'f3ec4083-e15e-4924-b822-c8177243e794': { x: 0, y: 0, w: 91.5, h: 100 },
+    // Wellcome49_001r (r, 5941x7127px, x=8%, w=92%)
+    '90517e25-dc3a-4d81-a736-e4872519bfb8': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_001v (v, 5941x7127px, x=0%, w=91.5%)
+    '8f4e0f39-f30b-4d66-9225-75645206fe29': { x: 0, y: 0, w: 91.5, h: 100 },
+    // Wellcome49_002r (r, 5941x7127px, x=8%, w=92%)
+    '838510b7-c797-496a-8e1e-a8fa10771722': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_002v (v, 5941x7127px, x=0%, w=91.5%)
+    '7e1c947b-080e-4e69-8c72-47955638fc95': { x: 0, y: 0, w: 91.5, h: 100 },
+    // Wellcome49_003r (r, 5941x7127px, x=8%, w=92%)
+    '9e8f622c-f55e-455c-a822-bd35ce2d2a17': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_003v (v, 5941x7127px, x=0%, w=91.5%)
+    'd221ac70-34fa-47a7-9a04-a1c8a4ce9bca': { x: 0, y: 0, w: 91.5, h: 100 },
+    // Wellcome49_004r (r, 5941x7127px, x=8%, w=92%)
+    'bbcf5ce4-9011-4470-9a0c-5c20ac628a00': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_004v (v, 5941x7127px, x=0%, w=91.5%)
+    '4266b369-a7da-48bb-91f7-9388e1b24d6c': { x: 0, y: 0, w: 91.5, h: 100 },
+    // Wellcome49_005r (r, 5941x7127px, x=8%, w=92%)
+    '256c3d02-c7bb-44e2-a107-15f1befde20d': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_005v (v, 5941x7127px, x=0%, w=91.5%)
+    '5994b153-0dfc-406c-9077-cf434596abd3': { x: 0, y: 0, w: 91.5, h: 100 },
+    // Wellcome49_006r (r, 5941x7127px, x=8%, w=92%)
+    '532883c6-af13-48b3-a6e0-78c42fcd05fe': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_006v (v, 5941x7127px, x=0%, w=91.5%)
+    '6fe999c8-f4c4-4cf4-baa5-f3d58a5b6a84': { x: 0, y: 0, w: 91.5, h: 100 },
+    // Wellcome49_007r (r, 5941x7127px, x=8%, w=92%)
+    'e6becffe-419e-4613-bc7c-3c27013517a1': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_007v (v, 5941x7127px, x=0%, w=91.5%)
+    '75cfc69f-05ab-4bb2-af72-769b62439c43': { x: 0, y: 0, w: 91.5, h: 100 },
+    // Wellcome49_008r (r, 5941x7127px, x=8%, w=92%)
+    'eabc1721-7ced-4c99-8887-8248461dac2a': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_008v (v, 5941x7127px, x=0%, w=91.5%)
+    '81ce8f02-b8c6-4b13-8074-2d8db9c73378': { x: 0, y: 0, w: 91.5, h: 100 },
+    // Wellcome49_009r (r, 5941x7127px, x=8%, w=92%)
+    '7ce30d6c-2b1b-45fa-a612-2be15862efc2': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_009v (v, 5941x7127px, x=0%, w=91.5%)
+    'c3a1514e-b526-4a20-9b72-348074578ab4': { x: 0, y: 0, w: 91.5, h: 100 },
+    // Wellcome49_010r (r, 5941x7127px, x=8%, w=92%)
+    '3fdff163-4ae6-442f-ba39-9ce59fcf1b23': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_010v (v, 5941x7127px, x=0%, w=91.5%)
+    '9a9ab688-933b-4aec-90b1-a69e30eae784': { x: 0, y: 0, w: 91.5, h: 100 },
+    // Wellcome49_011r (r, 5941x7127px, x=8%, w=92%)
+    '9ace3325-ef1a-48d2-99f1-650bd407eddb': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_011v (v, 5941x7127px, x=0%, w=91.5%)
+    '40805b8d-ab56-45fd-99c7-2b2500b6d466': { x: 0, y: 0, w: 91.5, h: 100 },
+    // Wellcome49_012r (r, 5941x7127px, x=8%, w=92%)
+    'b80d72b0-5896-4305-a015-9a9a4b1bd3f9': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_012v (v, 5941x7127px, x=0%, w=91.5%)
+    'a2a6242d-2ca1-4832-b8d2-6e2d15a4a38f': { x: 0, y: 0, w: 91.5, h: 100 },
+    // Wellcome49_013r (r, 5941x7127px, x=8%, w=92%)
+    '8fdc1e6b-9931-4205-82d6-c0db5efef100': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_013v (v, 5941x7127px, x=0%, w=93%)
+    'd3d3ee79-3788-454a-a944-526b9af78d05': { x: 0, y: 0, w: 93, h: 100 },
+    // Wellcome49_014r (r, 5941x7127px, x=9%, w=91%)
+    '49b98574-05ec-46cc-8a30-2c7b80c7d7a4': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_014v (v, 5941x7127px, x=0%, w=93%)
+    'e7bc41fc-85c5-4c71-89fc-71bd92c01403': { x: 0, y: 0, w: 93, h: 100 },
+    // Wellcome49_015r (r, 5941x7127px, x=9%, w=91%)
+    '16d273bd-a17e-407c-806a-62cb07df6c71': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_015v (v, 5941x7127px, x=0%, w=93%)
+    'a15bfa52-4b7c-41fb-bbe9-ac1cc16c1a9c': { x: 0, y: 0, w: 93, h: 100 },
+    // Wellcome49_016r (r, 5941x7127px, x=9%, w=91%)
+    '4a592572-90e4-4f6c-a05d-f8858bff7b70': { x: 8.5, y: 0, w: 91.5, h: 100 },
+    // Wellcome49_016v (v, 5941x7127px, x=0%, w=93%)
+    'c0ea635c-4dd5-406d-baac-deca68850435': { x: 0, y: 0, w: 93, h: 100 },
+    // Wellcome49_017r (r, 5941x7127px, x=9%, w=91%)
+    '430fb3b3-c1c6-4516-9b2b-7a86024875af': { x: 8.5, y: 0, w: 91.5, h: 100 },
+    // Wellcome49_017v (v, 5941x7127px, x=0%, w=93.1%)
+    '87fd638b-15e6-48ee-9e08-3ef35b1358d8': { x: 0, y: 0, w: 92, h: 100 },
+    // Wellcome49_018r (r, 5941x7127px, x=9%, w=91%)
+    'f04e01fd-0ee5-4faa-9cb6-7830a184bbda': { x: 8.5, y: 0, w: 91.5, h: 100 },
+    // Wellcome49_018v (v, 5941x7127px, x=0%, w=93.1%)
+    '6511e368-1323-4788-aff7-f2f0e57ee0a7': { x: 0, y: 0, w: 92.5, h: 100 },
+    // Wellcome49_019r (r, 5941x7127px, x=9%, w=91%)
+    '58732f45-6ec1-4665-adf0-95dabefdd41d': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_019v (v, 5941x7127px, x=0%, w=93.1%)
+    'f52088ca-dcb8-42ee-8d5e-c6fe63337436': { x: 0, y: 0, w: 92.5, h: 100 },
+    // Wellcome49_020r (r, 5941x7127px, x=9%, w=91%)
+    '0726972f-c1f5-4444-95c6-7241f0751be9': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_020v (v, 5941x7127px, x=0%, w=93.1%)
+    '0c8260cf-9484-4cb2-baff-c8c2a4bfe9d5': { x: 0, y: 0, w: 92, h: 100 },
+    // Wellcome49_021r (r, 5941x7127px, x=9%, w=91%)
+    '05e573f1-a6a0-4648-a13b-45a416fc7595': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_021v (v, 5941x7127px, x=0%, w=93.1%)
+    'e62120f2-1d7f-45a9-af20-34b4dfc7181d': { x: 0, y: 0, w: 92, h: 100 },
+    // Wellcome49_022r (r, 5941x7127px, x=9%, w=91%)
+    '7b6e919d-3baf-471d-8bf0-f8b193102d25': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_022v (v, 5941x7127px, x=0%, w=93.1%)
+    'a1e73d52-0b78-473c-b8fb-900ec14018b8': { x: 0, y: 0, w: 92.5, h: 100 },
+    // Wellcome49_023r (r, 5941x7127px, x=9%, w=91%)
+    'e9f9764c-4113-4e97-9f76-9b0b8b0790c3': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_023v (v, 5941x7127px, x=0%, w=93.2%)
+    '75d7b7df-d823-4648-8d97-1e46ff5dc158': { x: 0, y: 0, w: 92.5, h: 100 },
+    // Wellcome49_024r (r, 5941x7127px, x=9%, w=91%)
+    '20010c41-a695-41a2-af48-ee8bd022986f': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_024v (v, 5941x7127px, x=0%, w=93.2%)
+    'b606d0ce-d094-4df6-bc0e-e54cd5008acc': { x: 0, y: 0, w: 92.5, h: 100 },
+    // Wellcome49_025r (r, 5941x7127px, x=9%, w=91%)
+    '4773a441-13ed-40ec-bdf6-4242dd754ace': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_025v (v, 5941x7127px, x=0%, w=93.2%)
+    'ffa4400b-38ea-40d3-8d9a-7ad1415f6799': { x: 0, y: 0, w: 92.5, h: 100 },
+    // Wellcome49_026r (r, 5941x7127px, x=9%, w=91%)
+    '7029453f-f6aa-4a6b-9d5a-7de4fcac762f': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_026v (v, 5941x7127px, x=0%, w=93.2%)
+    'e16993f2-90f1-49e4-8890-e0f02baa55ad': { x: 0, y: 0, w: 92.5, h: 100 },
+    // Wellcome49_027r (r, 5941x7127px, x=9%, w=91%)
+    'b40fb21d-c69b-475b-8392-351efcc9af7c': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_027v (v, 5941x7127px, x=0%, w=93.2%)
+    'f5c0ad9a-f3d0-4d17-b49a-74f5b2c432d3': { x: 0, y: 0, w: 92.5, h: 100 },
+    // Wellcome49_028r (r, 5941x7127px, x=9%, w=91%)
+    '307bc07a-cee4-4434-b565-585682dc4147': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_028v (v, 5941x7127px, x=0%, w=93.3%)
+    '4a4de3b1-ff98-435f-a488-ea87ebb7026f': { x: 0, y: 0, w: 92.5, h: 100 },
+    // Wellcome49_029r (r, 5941x7127px, x=9%, w=91%)
+    '8fef0ac4-caf6-43f9-84bd-4b0a739859cb': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_029v (v, 5941x7127px, x=0%, w=93.3%)
+    '97094104-061c-4ce0-a21f-24e69c1cbb64': { x: 0, y: 0, w: 93.3, h: 100 },
+    // Wellcome49_030r (r, 5941x7127px, x=9%, w=91%)
+    '0f39e41e-b467-4dc0-970b-6df64381f0eb': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_030v (v, 5941x7127px, x=0%, w=93.3%)
+    'dff55b19-59bd-4d40-b41d-80e407014b68': { x: 0, y: 0, w: 93.3, h: 100 },
+    // Wellcome49_031r (r, 5941x7127px, x=9%, w=91%)
+    '39ee89f7-be5a-4f9f-ab89-a80199454981': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_031v (v, 5941x7127px, x=0%, w=93.3%)
+    '9d1fd0df-0cec-4bdb-9944-252c9868b927': { x: 0, y: 0, w: 93.3, h: 100 },
+    // Wellcome49_032r (r, 5941x7127px, x=9%, w=91%)
+    '9e00b33a-9d24-4787-a290-04b9cfbf5bb9': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_032v (v, 5941x7127px, x=0%, w=93.3%)
+    '40bbd209-9246-4c51-85c6-faa9a9130d44': { x: 0, y: 0, w: 93.3, h: 100 },
+    // Wellcome49_033r (r, 5941x7127px, x=9%, w=91%)
+    'de2ff2ba-37b8-4cb0-91aa-80f699aa535d': { x: 8, y: 0, w: 92, h: 100 },
+    // Wellcome49_033v (v, 5941x7127px, x=0%, w=93.3%)
+    'a2cb8061-3523-402c-9239-8f02fba18641': { x: 0, y: 0, w: 93.3, h: 100 },
+    // Wellcome49_034r (r, 5941x7127px, x=9%, w=91%)
+    'f3ba0658-9d56-4b6c-8436-1fdb6a1c67bf': { x: 8.5, y: 0, w: 91.5, h: 100 },
+    // Wellcome49_034v (v, 5941x7127px, x=0%, w=93.4%)
+    'a0d4c11a-9aec-40e5-be4d-9bf7009ed36f': { x: 0, y: 0, w: 93.4, h: 100 },
+    // Wellcome49_035r (r, 5941x7127px, x=9%, w=91%)
+    'c5295e61-32e7-4863-8731-a2c986133843': { x: 8.5, y: 0, w: 91.5, h: 100 },
+    // Wellcome49_035v (v, 5941x7127px, x=0%, w=93.4%)
+    '238f4000-ca3e-4ee0-95cf-4313abacc71a': { x: 0, y: 0, w: 93.4, h: 100 },
+    // Wellcome49_036r (r, 5941x7127px, x=9%, w=91%)
+    '5b78bf7e-c3ef-4a07-9d35-8f933ab912e1': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_036v (v, 5941x7127px, x=0%, w=93.4%)
+    '6e2adfa1-316c-4be6-8774-f5ae69ec7074': { x: 0, y: 0, w: 93.4, h: 100 },
+    // Wellcome49_037r (r, 5941x7127px, x=9%, w=91%)
+    '2a8e64d6-4994-4b81-957b-843f3f4cbe40': { x: 8.5, y: 0, w: 91.5, h: 100 },
+    // Wellcome49_037v (v, 5941x7127px, x=0%, w=93.4%)
+    '6af45d09-a254-438d-ba72-fe388d72836f': { x: 0, y: 0, w: 93.4, h: 100 },
+    // Wellcome49_038r (r, 5941x7127px, x=9%, w=91%)
+    '1634cc12-fe2e-40c7-841b-ab9a04b91509': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_038v (v, 5941x7127px, x=0%, w=93.4%)
+    'ce170e24-4ad3-4ae9-9e9a-cede848e7486': { x: 0, y: 0, w: 93.4, h: 100 },
+    // Wellcome49_039r (r, 5941x7127px, x=9%, w=91%)
+    '69e13250-acec-46b3-a3ad-c10779361f08': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_039v (v, 5941x7127px, x=0%, w=93.4%)
+    'c01da939-2706-466d-adac-a69619b8fa65': { x: 0, y: 0, w: 92.5, h: 100 },
+    // Wellcome49_040r (r, 5941x7127px, x=9%, w=91%)
+    'c6435f8e-a46d-4137-9356-41b50dd327dc': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_040v (v, 5941x7127px, x=0%, w=93.5%)
+    '0e30e8a6-15c0-4866-bf66-8ddce59fedff': { x: 0, y: 0, w: 93.5, h: 100 },
+    // Wellcome49_041r (r, 5941x7127px, x=9%, w=91%)
+    '5f4c4afa-2440-4f92-a2cd-251897d0dfc1': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_041v (v, 5941x7127px, x=0%, w=93.5%)
+    'f8801155-1113-4148-84f4-2452f6f1ed92': { x: 0, y: 0, w: 93.5, h: 100 },
+    // Wellcome49_042v (v, 5941x7127px, x=0%, w=93.5%)
+    '2061f47e-8ab5-457c-ae51-41651259e7c9': { x: 0, y: 0, w: 93, h: 100 },
+    // Wellcome49_043r (r, 5941x7127px, x=9%, w=91%)
+    'a9c34234-07c3-4eac-a7a6-8d38f7f587c7': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_043v (v, 5941x7127px, x=0%, w=93.5%)
+    'ddc4d9fc-d822-4532-b25a-6ac04bf627a5': { x: 0, y: 0, w: 93.5, h: 100 },
+    // Wellcome49_044r (r, 5941x7127px, x=9%, w=91%)
+    '2c2e287a-89e4-4905-94d6-0fc131645ce2': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_044v (v, 5941x7127px, x=0%, w=93.5%)
+    '1a8c9c6b-4c73-4e37-be18-65ae5fd604dd': { x: 0, y: 0, w: 93.5, h: 100 },
+    // Wellcome49_045r (r, 5941x7127px, x=9%, w=91%)
+    '9c82c055-5dc8-4792-8026-f937a23c657e': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_045v (v, 5941x7127px, x=0%, w=93.6%)
+    '125a07ec-10c7-4ecb-95b4-0c9abd6621bb': { x: 0, y: 0, w: 93.6, h: 100 },
+    // Wellcome49_046r (r, 5941x7127px, x=9%, w=91%)
+    '54acae3e-64db-4477-869d-7cf19176d717': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_046v (v, 5941x7127px, x=0%, w=93.6%)
+    'd02c7996-7dfa-495b-8328-b2eb5229d451': { x: 0, y: 0, w: 93.6, h: 100 },
+    // Wellcome49_047r (r, 5941x7127px, x=9%, w=91%)
+    '5a6155ff-08be-406b-9354-7f01f8a09b03': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_047v (v, 5941x7127px, x=0%, w=93.6%)
+    'e4afade1-fbe0-473f-95e8-53e376506271': { x: 0, y: 0, w: 93.6, h: 100 },
+    // Wellcome49_048r (r, 5941x7127px, x=9%, w=91%)
+    '4464b774-3124-4da8-8056-2d70b7db6e44': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_048v (v, 5941x7127px, x=0%, w=93.6%)
+    '51333cee-e5f8-45fe-ba3f-3db91da5bc1f': { x: 0, y: 0, w: 93.6, h: 100 },
+    // Wellcome49_049r (r, 5941x7127px, x=9%, w=91%)
+    '5e0208fb-bfb9-455f-b5f3-eb59002a777d': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_049v (v, 5941x7127px, x=0%, w=93.6%)
+    '15b1e75e-402f-49e7-98a0-2370149a12d8': { x: 0, y: 0, w: 93.6, h: 100 },
+    // Wellcome49_050r (r, 5941x7127px, x=9%, w=91%)
+    '7541d2ef-2eba-4086-82cd-17e5301a051b': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_050v (v, 5941x7127px, x=0%, w=93.6%)
+    '5ea3e37a-f6c0-4637-addd-f44aea11ed87': { x: 0, y: 0, w: 93.6, h: 100 },
+    // Wellcome49_051r (r, 5941x7127px, x=9%, w=91%)
+    '7d5b576b-7a1a-4f76-ab15-3b6f00fee358': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_051v (v, 5941x7127px, x=0%, w=93.7%)
+    'e445045f-b1ad-43c2-a3d1-6f4b5a636b28': { x: 0, y: 0, w: 93.5, h: 100 },
+    // Wellcome49_052r (r, 5941x7127px, x=9%, w=91%)
+    '01b063a9-d4e5-43ac-bc08-bd62fce817df': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_052v (v, 5941x7127px, x=0%, w=93.7%)
+    '5ff43d6c-763c-4217-b4b0-842089049ece': { x: 0, y: 0, w: 93.4, h: 100 },
+    // Wellcome49_053r (r, 5941x7127px, x=9%, w=91%)
+    '2bac7d1e-d2e8-48b4-bc57-3d36b5dcee1f': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_053v (v, 5941x7127px, x=0%, w=93.7%)
+    'b0b1cfe7-7a23-42fc-bd9f-783127649e55': { x: 0, y: 0, w: 93, h: 100 },
+    // Wellcome49_054r (r, 5941x7127px, x=9%, w=91%)
+    '7a2e45b4-d9e3-4860-8d4e-38446a02f2eb': { x: 8.5, y: 0, w: 91.5, h: 100 },
+    // Wellcome49_054v (v, 5941x7127px, x=0%, w=93.7%)
+    '4f0c2399-e8fc-4c31-9e0d-a70136504893': { x: 0, y: 0, w: 92, h: 100 },
+    // Wellcome49_055r (r, 5941x7127px, x=9%, w=91%)
+    '6097205c-b588-4333-8728-6ff087f44542': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_055v (v, 5941x7127px, x=0%, w=93.7%)
+    '9b7fd474-0218-4bc0-964e-7d7a0a67f165': { x: 0, y: 0, w: 92.5, h: 100 },
+    // Wellcome49_056r (r, 5941x7127px, x=9%, w=91%)
+    'a0cfddd2-543d-4a9e-aec3-246de8521bce': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_056v (v, 5941x7127px, x=0%, w=93.8%)
+    '04ac45c1-602e-430c-926a-38290257b2ba': { x: 0, y: 0, w: 93, h: 100 },
+    // Wellcome49_057r (r, 5941x7127px, x=9%, w=91%)
+    '48267db9-2ab0-48cc-82ed-f89ddb9d3133': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_057v (v, 5941x7127px, x=0%, w=93.8%)
+    'e338545d-bd56-47bf-9dad-a0f90ed57859': { x: 0, y: 0, w: 93.8, h: 100 },
+    // Wellcome49_058r (r, 5941x7127px, x=9%, w=91%)
+    '9bd6ffe8-6fd7-4b8b-a423-21e860c9f522': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_058v (v, 5941x7127px, x=0%, w=93.8%)
+    '5ad6639d-ec1f-4037-9079-f9bc8b53fcda': { x: 0, y: 0, w: 92.5, h: 100 },
+    // Wellcome49_059r (r, 5941x7127px, x=9%, w=91%)
+    '3342bc51-74cb-487d-85e6-c7d0fef5c016': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_059v (v, 5941x7127px, x=0%, w=93.8%)
+    '49a65935-1520-4e64-b204-666025074024': { x: 0, y: 0, w: 92.5, h: 100 },
+    // Wellcome49_060r (r, 5941x7127px, x=9%, w=91%)
+    'e3c52a17-855f-4525-8d75-6b7ff1f22a63': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_060v (v, 5941x7127px, x=0%, w=93.8%)
+    '4bea81fc-9fe6-4417-a6d5-e5c136462bf1': { x: 0, y: 0, w: 92.5, h: 100 },
+    // Wellcome49_061r (r, 5941x7127px, x=9%, w=91%)
+    'b39a753e-be51-463b-a28e-cfce79e0a0c5': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_061v (v, 5941x7127px, x=0%, w=93.8%)
+    'a856e8e6-89de-4b3b-a6f9-fe4229d3bc0f': { x: 0, y: 0, w: 92.5, h: 100 },
+    // Wellcome49_062r (r, 5941x7127px, x=9%, w=91%)
+    '151b3128-69d9-4faa-bbb4-69405b3fb027': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_062v (v, 5941x7127px, x=0%, w=93.9%)
+    '1e76b063-b4c7-4e05-9704-544f66777f22': { x: 0, y: 0, w: 92.5, h: 100 },
+    // Wellcome49_063r (r, 5941x7127px, x=9%, w=91%)
+    '2e9bba72-3a08-4461-b5d7-69ebf9582946': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_064r (r, 5941x7127px, x=9%, w=91%)
+    'c2525dd7-987b-478b-b50a-60558b6c71d8': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_064v (v, 5941x7127px, x=0%, w=93.9%)
+    'e558227e-4a1a-4aac-97f8-d50a1b798555': { x: 0, y: 0, w: 92.5, h: 100 },
+    // Wellcome49_065r (r, 5941x7127px, x=9%, w=91%)
+    '6b9a434a-52bb-4b55-ad4c-d7b8fed9a852': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_065v (v, 5941x7127px, x=0%, w=93.9%)
+    '730ad186-a963-40a9-82db-32ba10009f45': { x: 0, y: 0, w: 92.5, h: 100 },
+    // Wellcome49_066r (r, 5941x7127px, x=9%, w=91%)
+    'c06b009b-50a6-4dbc-aa34-b02ae4000819': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_066v (v, 5941x7127px, x=0%, w=93.9%)
+    'f17c338c-d30d-4d5e-ad69-0ff99d7f9c8a': { x: 0, y: 0, w: 92.5, h: 100 },
+    // Wellcome49_067r (r, 5941x7127px, x=9%, w=91%)
+    '0ea2cfa4-b03c-4ca7-88e7-f10f3e2c14bc': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_067v (v, 5941x7127px, x=0%, w=93.9%)
+    'a578bc23-39cb-4a9b-8bbe-ce62a7679542': { x: 0, y: 0, w: 92.5, h: 100 },
+    // Wellcome49_068r (r, 5941x7127px, x=9%, w=91%)
+    '06184cae-c892-4624-a49d-ea6f1d8b6aad': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_068v (v, 5941x7127px, x=0%, w=94%)
+    '63b60aa8-aec4-45e7-94f9-a2ed397f0da4': { x: 0, y: 0, w: 92.5, h: 100 },
+    // Wellcome49_069r (r, 5941x7127px, x=9%, w=91%)
+    'a46d54ef-16f7-4c0e-922e-4880f6a1d3f8': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_069v (v, 5941x7127px, x=0%, w=94%)
+    'dfc2a2c3-85fb-4416-984f-fc0eae9254cb': { x: 0, y: 0, w: 94, h: 100 },
+    // Wellcome49_070r (r, 5941x7127px, x=9%, w=91%)
+    'b3ae4e9f-392a-49d6-b4bc-54de9556220d': { x: 9, y: 0, w: 91, h: 100 },
+    // Wellcome49_070v (v, 5941x7127px, x=0%, w=94%)
+    '694388a6-260f-4e13-9c56-bf9ec66328af': { x: 0, y: 0, w: 94, h: 100 },
+
+    // --- Basel KII11 outer-edge crop --------------------------------
+    // Trims a thin outer strip (verso: 1% left, recto: 1% right) plus
+    // 5% top / 5% bottom on every folio and on the Vorsatzblätter.
+    // Einband and Rücken are the only entries omitted.
+    // Basel_KII11_001r Einband vorne innen
+    '927eb67b-acdf-49ee-bd47-df6c4832938c': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_001r (r, x=0%, w=99%, y=5%, h=90%)
+    '0aec72ce-a105-4c86-ab45-5f2072f1355e': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_001v (v, x=1%, w=99%, y=5%, h=90%)
+    '9becef12-be84-48e5-a5fb-cb6c5f8c857c': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_002r (r, x=0%, w=99%, y=5%, h=90%)
+    '8c466a1f-e46d-4ec0-8fc4-37db93b3d50c': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_002v (v, x=1%, w=99%, y=5%, h=90%)
+    '6cab59b4-93cc-4437-bf4d-3812c19a5f35': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_003r (r, x=0%, w=99%, y=5%, h=90%)
+    '3f10d7a7-f18c-4585-9b4e-084278a4620a': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_003v (v, x=1%, w=99%, y=5%, h=90%)
+    'e90ce59b-8340-4f69-9891-501986145c1d': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_004r (r, x=0%, w=99%, y=5%, h=90%)
+    'cc85798b-2da1-4190-876f-5979cbc40daa': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_004v (v, x=1%, w=99%, y=5%, h=90%)
+    '5a5ccf5c-f75f-446f-a5a2-1eb6e494a9ad': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_005r (r, x=0%, w=99%, y=5%, h=90%)
+    '9ca9e8f8-c708-45e8-8b72-e0d40bf99af5': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_005v (v, x=1%, w=99%, y=5%, h=90%)
+    '96ccc7b7-99d5-4268-bf82-998dc5383fd8': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_006r (r, x=0%, w=99%, y=5%, h=90%)
+    'e676eb37-b6e4-4c4a-b2a8-862ea160f17c': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_006v (v, x=1%, w=99%, y=5%, h=90%)
+    '2aa4fba6-9a95-4643-99c6-15240ac36648': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_007r (r, x=0%, w=99%, y=5%, h=90%)
+    '5cfbec3a-44ff-44be-8d3f-ae772052178f': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_007v (v, x=1%, w=99%, y=5%, h=90%)
+    'aa1ddc76-583c-4e78-bc10-211262d766cf': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_008r (r, x=0%, w=99%, y=5%, h=90%)
+    '16475a25-306d-4f97-b00e-704531177b2f': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_008v (v, x=1%, w=99%, y=5%, h=90%)
+    '36484f88-acec-4ba3-9ed4-0876509af6af': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_009r (r, x=0%, w=99%, y=5%, h=90%)
+    '3aed0f2b-2d8c-4ea0-9352-f1abec393c3d': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_009v (v, x=1%, w=99%, y=5%, h=90%)
+    '65f989a6-27f4-4673-80bb-c47557367491': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_010r (r, x=0%, w=99%, y=5%, h=90%)
+    'a741d770-1fcc-4741-a2ee-b78fd07a4380': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_010v (v, x=1%, w=99%, y=5%, h=90%)
+    'dd25d21e-aa80-48ab-a6a6-cbfbf9785f04': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_011r (r, x=0%, w=99%, y=5%, h=90%)
+    'ab7e1477-966f-486d-8b35-a4afd9b5096c': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_011v (v, x=1%, w=99%, y=5%, h=90%)
+    'e742859a-187e-4361-9d2b-64a4153c685e': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_012r (r, x=0%, w=99%, y=5%, h=90%)
+    '4cac0347-5ce4-43ff-bd09-05466dd89c04': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_012v (v, x=1%, w=99%, y=5%, h=90%)
+    'd525c2a2-c2f4-4208-9b82-aa5d40261f35': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_013r (r, x=0%, w=99%, y=5%, h=90%)
+    '0049f709-b2ba-48f3-9858-638fdb14ab80': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_013v (v, x=1%, w=99%, y=5%, h=90%)
+    '35065aa6-9ecb-4db8-bc6f-9d720872de90': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_014r (r, x=0%, w=99%, y=5%, h=90%)
+    'e281745b-9a11-436f-b7f9-31039684aba4': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_014v (v, x=1%, w=99%, y=5%, h=90%)
+    '2ab44a9d-26d7-4cce-aea2-69d7b9036628': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_015r (r, x=0%, w=99%, y=5%, h=90%)
+    '44359951-4c9c-45a8-851c-bfd3738f1895': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_015v (v, x=1%, w=99%, y=5%, h=90%)
+    '05f76c62-64de-49b3-9e53-36a9d1f5fa47': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_016r (r, x=0%, w=99%, y=5%, h=90%)
+    '4df5cff8-9dbc-419c-bac8-a3b2848433b6': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_016v (v, x=1%, w=99%, y=5%, h=90%)
+    'c4e765c6-5f0a-462f-adf3-7bf60857bea7': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_017r (r, x=0%, w=99%, y=5%, h=90%)
+    '59cfb499-70fd-4afa-b17c-c93ee5e1da3e': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_017v (v, x=1%, w=99%, y=5%, h=90%)
+    'd794bdbf-0a53-45f6-87b5-ea99f55da12e': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_018r (r, x=0%, w=99%, y=5%, h=90%)
+    'd8d44766-5612-4172-a0b9-3ed0b67cd83b': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_018v (v, x=1%, w=99%, y=5%, h=90%)
+    'fa2406b6-dd79-4a7d-887c-bba2425820b5': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_019r (r, x=0%, w=99%, y=5%, h=90%)
+    '0e059d34-f3ba-4b42-9dcf-7d2ed1b9cdbf': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_019v (v, x=1%, w=99%, y=5%, h=90%)
+    '2b444a72-eb58-4dd6-8e43-e730b297bc0f': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_020r (r, x=0%, w=99%, y=5%, h=90%)
+    '8e98cb9d-99d1-4337-8c72-87c59a9a75ed': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_020v (v, x=1%, w=99%, y=5%, h=90%)
+    'dcf66947-f237-49e2-9d5a-24a398c11107': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_021r (r, x=0%, w=99%, y=5%, h=90%)
+    '4cb62335-996c-4e24-aa7d-63371a8d7865': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_021v (v, x=1%, w=99%, y=5%, h=90%)
+    'c8ecf99a-d178-46a4-b675-555fce83d7df': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_022r (r, x=0%, w=99%, y=5%, h=90%)
+    'dd0e0327-beb4-4e35-97ad-92a918348bfc': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_022v (v, x=1%, w=99%, y=5%, h=90%)
+    'e6d505db-2d6d-4604-b16c-ccbbe58fa587': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_023r (r, x=0%, w=99%, y=5%, h=90%)
+    '744d36e7-e7c8-4a2e-953e-79b83ac42d7e': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_023v (v, x=1%, w=99%, y=5%, h=90%)
+    'e145fbb0-4ace-4d18-bccf-83e5fca6d77d': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_024r (r, x=0%, w=99%, y=5%, h=90%)
+    'f7aee2b5-6d73-4caa-a233-36c35e99caba': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_024v (v, x=1%, w=99%, y=5%, h=90%)
+    'a787dc9e-b686-4be1-bc62-a41babe96249': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_025r (r, x=0%, w=99%, y=5%, h=90%)
+    '595f5459-80f6-4678-a2ce-9ea4f00980cd': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_025v (v, x=1%, w=99%, y=5%, h=90%)
+    '864d346f-f19e-40c6-a971-483de8448cdf': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_026r (r, x=0%, w=99%, y=5%, h=90%)
+    '16d3970b-3657-4ea7-9639-3588c9efe300': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_026v (v, x=1%, w=99%, y=5%, h=90%)
+    'ee813fbc-b494-46e2-8d5d-ad8c744a01d1': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_027r (r, x=0%, w=99%, y=5%, h=90%)
+    '8dcefad7-7e08-4c65-8088-6a29bc1b1380': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_027v (v, x=1%, w=99%, y=5%, h=90%)
+    '5c70ab4e-25c2-4db3-9e73-cdf438eb0631': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_028r (r, x=0%, w=99%, y=5%, h=90%)
+    'f63b9cc7-10cf-41da-acaa-5b96c2978604': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_028v (v, x=1%, w=99%, y=5%, h=90%)
+    'dd1648fb-c3fa-4a98-8fcb-518c1a4f27d8': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_029r (r, x=0%, w=99%, y=5%, h=90%)
+    '13f668a2-cf05-485c-8ebd-10cc77ae0b17': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_029v (v, x=1%, w=99%, y=5%, h=90%)
+    'be37d9f6-7aef-49fb-9946-2f87efccc887': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_030r (r, x=0%, w=99%, y=5%, h=90%)
+    'c2d3134c-61da-45c8-ba92-4af0560e8708': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_030v (v, x=1%, w=99%, y=5%, h=90%)
+    '79dfd777-107c-400d-8c3c-417944d92e52': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_031r (r, x=0%, w=99%, y=5%, h=90%)
+    '947084e7-5f15-4abb-b4cb-c397805bf2b2': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_031v (v, x=1%, w=99%, y=5%, h=90%)
+    'ecc7d512-6d84-4787-a96e-df21b0054a60': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_032r (r, x=0%, w=99%, y=5%, h=90%)
+    '5c4caf31-495b-4bfc-acdc-bed099c3f51a': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_032v (v, x=1%, w=99%, y=5%, h=90%)
+    '43df9fd1-5ce8-4fa3-941d-8a702c01d5d6': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_033r (r, x=0%, w=99%, y=5%, h=90%)
+    '607586f6-ffb8-4365-8b6f-64249932e18a': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_033v (v, x=1%, w=99%, y=5%, h=90%)
+    'a4d04d4d-2396-41ce-abf2-d1852f057bb1': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_035r (r, x=0%, w=99%, y=5%, h=90%)
+    'b1a4fa6d-4797-42e6-af17-28dfeccf0cd4': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_035v (v, x=1%, w=99%, y=5%, h=90%)
+    '00bc1ce1-44c0-4fdf-b9fa-c77ed24c30da': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_036r (r, x=0%, w=99%, y=5%, h=90%)
+    'ed6fb9d3-e34d-4098-94a4-94e54f14a749': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_036v (v, x=1%, w=99%, y=5%, h=90%)
+    '2c741648-06d7-4527-bf6c-1fb02b77ebfb': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_037r (r, x=0%, w=99%, y=5%, h=90%)
+    '67dc1db0-6eef-4d58-8732-26ca567092e8': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_037v (v, x=1%, w=99%, y=5%, h=90%)
+    '7515f32f-5ced-4ae7-8d13-97bb3f2ecbdc': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_Vorsatz_1r (r, x=0%, w=99%, y=5%, h=90%)
+    '3bf442b6-5809-4335-ab94-8538c0f4c623': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_Vorsatz_1v (v, x=1%, w=99%, y=5%, h=90%)
+    'e0faa9c0-a286-4476-8fa0-e350ea64be45': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_Vorsatz_2r (r, x=0%, w=99%, y=5%, h=90%)
+    '8457e5ef-eea3-423c-9cca-720c7d701baa': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_Vorsatz_2v (v, x=1%, w=99%, y=5%, h=90%)
+    'a3ef9f62-a1fb-4ca1-bf23-36c3724b3d3c': { x: 3.5, y: 5, w: 96.5, h: 90 },
+    // Basel_KII11_Vorsatz_3r (r, x=0%, w=99%, y=5%, h=90%)
+    '43600d9c-bf75-4c58-911b-a94e30948874': { x: 0, y: 5, w: 99, h: 90 },
+    // Basel_KII11_Vorsatz_3v (v, x=1%, w=99%, y=5%, h=90%)
+    '2fbc481f-8abe-4da7-b22a-fa80ba5261f7': { x: 1, y: 5, w: 99, h: 90 },
+    // Basel_KII11_ Einband hinten innen (r, x=0%, w=99%, y=5%, h=90%)
+    '2a5f4ff0-560f-4189-bb9c-34138f6cc9a1': { x: 0, y: 5, w: 99, h: 90 },
   };
 
-  function tileSourceForGuid(guid) {
+  // Build the OSD tile-source config for one folio. Always uses the
+  // info.json (deep-zoom pyramid). When a GUID has a crop entry, we
+  // convert the pct region to pixel coords on the master and pass it
+  // as `clip` — OSD then only requests tiles that intersect the clip
+  // rect, keeping tiled zoom performance intact.
+  //
+  // masterWidth/masterHeight come from the cached info.json fetch;
+  // when they're absent (fetch failed) we fall back to the plain
+  // info.json URL and skip the crop for that page.
+  function tileSourceConfigForGuid(guid, masterWidth, masterHeight) {
     var crop = GUID_CROP_PCT[guid];
-    if (!crop) return infoJsonUrl(guid); // uncropped, deep-zoomable
-    var region = 'pct:' + crop.x + ',' + crop.y + ',' + crop.w + ',' + crop.h;
-    return {
-      type: 'image',
-      url: IIIF_BASE + guid + '/' + region + '/max/0/default.jpg',
-    };
+    if (!crop || !masterWidth || !masterHeight) {
+      return { tileSource: infoJsonUrl(guid) };
+    }
+    var px = new OpenSeadragon.Rect(
+      masterWidth  * (crop.x / 100),
+      masterHeight * (crop.y / 100),
+      masterWidth  * (crop.w / 100),
+      masterHeight * (crop.h / 100)
+    );
+    return { tileSource: infoJsonUrl(guid), clip: px };
   }
 
   // Values the legacy code uses to mean "no image on this side". These
@@ -230,31 +688,56 @@
     // side (its own aspect ratio will be discovered by OSD from the same
     // info.json anyway, at the cost of possibly re-introducing a gap).
     Promise.all([
-      leftGuid  ? fetchAspectRatio(leftGuid)  : Promise.resolve(null),
-      rightGuid ? fetchAspectRatio(rightGuid) : Promise.resolve(null),
-    ]).then(function (aspects) {
-      // aspects[1] (right AR) isn't needed here: OSD derives each source's
-      // displayed width from its own info.json when we pin height=1. We
-      // only need the left AR to know where the right source starts on x.
-      var leftAR = aspects[0]; // width / height, or null
+      leftGuid  ? fetchInfo(leftGuid)  : Promise.resolve(null),
+      rightGuid ? fetchInfo(rightGuid) : Promise.resolve(null),
+    ]).then(function (infos) {
+      // With OSD's `clip`, an item's displayed bounds still come from
+      // the full master (clip only culls tiles outside the rect). So a
+      // clipped folio would leave a blank strip where the cropped-away
+      // part used to be. We compensate by placing each item at an x
+      // that shifts its clip-left onto the intended viewport-x.
+      //
+      // In an item's own space (height=1), 1 master-pixel = 1/masterH
+      // viewport units, so clip-left in viewport units is
+      //   (crop.x / 100) * (masterW / masterH)   [= (crop.x/100) * masterAR]
+      // Setting item.x = intendedX - clipLeftVU makes the clip's left
+      // edge land exactly at intendedX.
+      var leftInfo  = infos[0];
+      var rightInfo = infos[1];
+      var leftDisplayedAR = displayedAspectRatio(leftGuid, leftInfo);
+
+      function clipLeftVU(guid, info) {
+        if (!info) return 0;
+        var crop = GUID_CROP_PCT[guid];
+        if (!crop) return 0;
+        return (crop.x / 100) * (info.width / info.height);
+      }
 
       var tileSources = [];
-      var leftWidthVU = leftAR || 1; // fallback: unit width if AR unknown
+      var leftVisibleW = leftDisplayedAR || 1; // width of the cropped left folio
       if (leftGuid) {
-        tileSources.push({
-          tileSource: tileSourceForGuid(leftGuid),
-          x: 0,
-          y: 0,
-          height: 1,
-        });
+        var leftCfg = tileSourceConfigForGuid(
+          leftGuid,
+          leftInfo && leftInfo.width,
+          leftInfo && leftInfo.height
+        );
+        // Place the left folio so its clip's left edge sits at x=0.
+        leftCfg.x = -clipLeftVU(leftGuid, leftInfo);
+        leftCfg.y = 0;
+        leftCfg.height = 1;
+        tileSources.push(leftCfg);
       }
       if (rightGuid) {
-        tileSources.push({
-          tileSource: tileSourceForGuid(rightGuid),
-          x: leftWidthVU + SPREAD_GAP,
-          y: 0,
-          height: 1,
-        });
+        var rightCfg = tileSourceConfigForGuid(
+          rightGuid,
+          rightInfo && rightInfo.width,
+          rightInfo && rightInfo.height
+        );
+        // Right folio's clip-left should sit at (leftVisibleW + gap).
+        rightCfg.x = leftVisibleW + SPREAD_GAP - clipLeftVU(rightGuid, rightInfo);
+        rightCfg.y = 0;
+        rightCfg.height = 1;
+        tileSources.push(rightCfg);
       }
 
       startViewer(tileSources);
@@ -342,40 +825,47 @@
     }
   };
 
-  // Fetch a IIIF info.json and return the *displayed* aspect ratio
-  // (width / height) for this GUID. If the GUID has a crop override in
-  // GUID_CROP_PCT, the aspect ratio reflects the cropped region — so the
-  // right folio's x-position stays flush with the visible edge of the
-  // left folio, not the original master's edge.
+  // Fetch a IIIF info.json and return the master's raw pixel dimensions
+  // as { width, height }. Callers derive the *displayed* aspect ratio
+  // (accounting for any GUID_CROP_PCT entry) and the pixel-space clip
+  // rect from this. Resolves to null on any failure so callers can fall
+  // back gracefully.
   //
-  // Resolves to null on any failure so callers can fall back gracefully.
-  // Cached per GUID (renderSpread runs on every page turn; aspect ratios
-  // never change for a given image + crop combination).
-  var _aspectCache = {};
-  function fetchAspectRatio(guid) {
-    if (_aspectCache[guid] !== undefined) return Promise.resolve(_aspectCache[guid]);
+  // Cached per GUID — renderSpread runs on every page turn, but a
+  // master's dimensions never change.
+  var _infoCache = {};
+  function fetchInfo(guid) {
+    if (_infoCache[guid] !== undefined) return Promise.resolve(_infoCache[guid]);
     return fetch(infoJsonUrl(guid))
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (info) {
         if (!info || !info.width || !info.height) {
-          _aspectCache[guid] = null;
+          _infoCache[guid] = null;
           return null;
         }
-        var w = info.width;
-        var h = info.height;
-        var crop = GUID_CROP_PCT[guid];
-        if (crop) {
-          w = info.width  * (crop.w / 100);
-          h = info.height * (crop.h / 100);
-        }
-        var ar = w / h;
-        _aspectCache[guid] = ar;
-        return ar;
+        var dims = { width: info.width, height: info.height };
+        _infoCache[guid] = dims;
+        return dims;
       })
       .catch(function () {
-        _aspectCache[guid] = null;
+        _infoCache[guid] = null;
         return null;
       });
+  }
+
+  // Displayed aspect ratio (width/height) for this GUID: reflects the
+  // GUID_CROP_PCT region when one applies, else the master's raw AR.
+  // Returns null if the info wasn't fetchable.
+  function displayedAspectRatio(guid, info) {
+    if (!info) return null;
+    var w = info.width;
+    var h = info.height;
+    var crop = GUID_CROP_PCT[guid];
+    if (crop) {
+      w *= (crop.w / 100);
+      h *= (crop.h / 100);
+    }
+    return w / h;
   }
 
   function makeInlineBanner(message) {
